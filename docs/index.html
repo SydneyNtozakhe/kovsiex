@@ -347,7 +347,7 @@ input[type=range]{padding:0;border:0;background:none;accent-color:#ffffff;height
     <input id="lPass" type="password" required autocomplete="current-password">
     <button class="btn full" id="lBtn" type="submit">Login</button>
     <div class="err" id="lErr"></div>
-    <div class="hint" style="text-align:center">Use the email and password your Manager gave you.<br>Forgotten it? Ask a Manager to reset it.<br><span style="opacity:.5">v10 · GitHub</span></div>
+    <div class="hint" style="text-align:center">Use the email and password your Manager gave you.<br>Forgotten it? Ask a Manager to reset it.<br><span style="opacity:.5">v11 · GitHub</span></div>
   </form>
 </section>
 
@@ -406,7 +406,7 @@ window.addEventListener('error', function (e) {
   if (!box) { box = document.createElement('div'); box.id = 'jsErr';
     box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#5a1d22;color:#fff;border:1px solid #e5484d;border-radius:6px;padding:12px 14px;font:13px/1.4 system-ui,sans-serif';
     document.body.appendChild(box); }
-  box.textContent = '[v10] Something went wrong on this page: ' + (e.message || e.error) + ' — please send this message to the portal admin.';
+  box.textContent = '[v11] Something went wrong on this page: ' + (e.message || e.error) + ' — please send this message to the portal admin.';
 });
 </script>
 <script>
@@ -899,7 +899,7 @@ function pRequests(){
       ${R.autoNowPlaying?'<div class="hint">Updates automatically from RadioDJ via Iono.fm. Type below only to correct it.</div>':''}
       ${ro?'':`<form id="npForm" class="frow" style="margin-top:14px"><div><input id="npT" placeholder="Song title" maxlength="120" required></div>
         <div><input id="npA" placeholder="Artist" maxlength="120"></div><div style="flex:0 0 auto"><button class="btn" id="npB">Set</button></div></form>`}
-      ${R.recent.length>1?`<div class="lbl-sm" style="margin-top:16px">Recently played</div>${R.recent.slice(1,6).map(p=>`<div class="played">${pic(p.art)}<div class="t"><b>${esc(p.title)}</b><span>${esc(p.artist)}</span></div><div class="tm">${esc(p.at)}</div></div>`).join('')}`:''}
+      ${R.recent.length?`<div class="lbl-sm" style="margin-top:16px">Recently played</div>${R.recent.slice(0,5).map(p=>`<div class="played">${pic(p.art)}<div class="t"><b>${esc(p.title)}</b><span>${esc(p.artist)}</span></div><div class="tm">${esc(p.at)}</div></div>`).join('')}`:''}
     </div>
     <div class="card"><h3>Send a Request <span class="vbadge">✔ VERIFIED</span></h3>
       ${ro?'<div class="hint" style="margin:0">Not available while suspended.</div>':`<form id="lrForm">
@@ -1175,15 +1175,24 @@ function renderMgmt(){
         <label>How far ahead staff can book (days)</label><input type="number" id="sW" min="1" max="90" value="${m.settings.bookingWindow}" required>
         <div class="hint">Individual staff can have their own weekly target under People &amp; HR. Approved leave lowers that week's target by one fifth per weekday off.</div>
         <label>Warning limit (warnings before removal from the team)</label><input type="number" id="sMW" min="1" max="10" value="${m.settings.maxWarnings}" required>
-        <label>Iono.fm stream ID (songs from RadioDJ show automatically)</label>
+        <label>Iono.fm stream ID (songs from your playout system show automatically)</label>
         <div class="frow"><div class="wide"><input id="sIO" placeholder="Stream ID, or the full xmetadata link" value="${esc(m.settings.ionoStream||'')}"></div>
           <div style="flex:0 0 auto"><button class="btn ghost" type="button" id="sIOT">Test</button></div></div>
         <div class="hint" id="sIOR" style="margin-top:6px">Leave blank to set Now Playing by hand on the Requests page.</div>
+        ${m.settings.radiodj?`<label>Instant song updates from the playout system (optional)</label>
+        <div class="info" style="margin:0;display:block">If your playout system (Myriad, RadioDJ, …) can send a web request when a song starts, point it here and songs show on the listener site within about 2 seconds instead of ~15–20 seconds via Iono.fm.
+          <div class="copyrow"><input readonly id="pxU" value="${esc(m.settings.radiodj.url)}"><button class="btn ghost sm" type="button" data-copy="pxU">Copy</button></div>
+          <div class="copyrow"><input readonly id="pxK" value="xpwd=${esc(m.settings.radiodj.key)}&artist=ARTIST&title=TITLE&duration=SECONDS"><button class="btn ghost sm" type="button" data-copy="pxK">Copy</button></div>
+          <div class="hint">Send as POST (form) or GET. Replace ARTIST, TITLE and SECONDS with your playout system’s fields. ${m.settings.radiodj.lastPush?'Last song received: '+esc(m.settings.radiodj.lastPush):'Nothing received yet.'}
+          <button class="linkbtn" type="button" id="pxNew">New key</button></div></div>`:''}
         <label>Live stream link (for the listener website player)</label><input id="sSU" placeholder="https:..." value="${esc(m.settings.streamUrl)}">
         <div class="hint" style="margin-top:6px">Use the syndication URL from Iono.fm (Streaming → Setup encoder).</div>
         <label>Useful links (one per line: Name | link)</label><textarea id="sL" rows="6" style="font-family:monospace;font-size:13px">${esc(m.settings.linksRaw)}</textarea>
         <div class="hint">These appear under the link icon next to the notification bell for everyone. Leave the link blank to show “not set yet”.</div>
         <button class="btn" style="margin-top:14px" id="sB">Save settings</button></form></div>`;
+    document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{ const i=$(b.dataset.copy); i.select(); try{ navigator.clipboard.writeText(i.value).then(()=>toast('Copied')); }catch(_){ toast('Select it and copy'); } });
+    if($('pxNew')) $('pxNew').onclick = async () => { if(!confirm('Make a new key? The old one stops working, so the playout system will need the new one.')) return;
+      try{ S.mgmt = await call('newRadioDJKey'); toast('New key made'); renderMgmt(); }catch(_){} };
     $('sIOT').onclick = async () => { const b=$('sIOT'); busy(b,true);
       try{ $('sIOR').textContent = await call('testIono', $('sIO').value); $('sIOR').style.color='var(--ok)'; }catch(e){ $('sIOR').textContent=((e&&e.message)||'').split('Error: ').join(''); $('sIOR').style.color='#ff8a8d'; }
       busy(b,false); };

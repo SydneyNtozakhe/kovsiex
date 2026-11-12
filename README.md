@@ -44,6 +44,14 @@ GitHub Pages is free for **public** repositories. Nothing secret is stored in th
 - **Change how a page looks or works:** edit the file in `docs/` and commit. GitHub Pages updates itself.
 - **Change server logic:** paste the new `Code.gs` into Apps Script, then **Manage deployments → pencil → New version → Deploy**. Pick **New version** on the existing deployment so the URL stays the same.
 
+## Live song info on the listener site
+
+The listener site shows the song playing now, with album art, a progress bar and time left. When a song ends it moves to the top of **Recently played**, which keeps the last 5.
+
+- **Which song is playing** comes from **Iono.fm**, which receives song titles with the stream. Set the stream ID in the portal under **Settings → Iono.fm stream ID**. Iono.fm allows one check every 15 seconds, so songs appear within about 15–20 seconds.
+- **Faster (about 2 seconds):** if the playout system (Myriad, RadioDJ, …) can send a web request when a song starts, point it at the address and key shown in **Settings → Instant song updates**.
+- **Album art and song length** come from Apple Music (iTunes Search). No account is needed.
+
 ## Preview without the server
 
 Open `docs/index.html` with `apiUrl` left empty in `config.js`. The portal runs on demo data and a pink banner says so. Any email and password signs in.

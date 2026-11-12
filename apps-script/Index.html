@@ -886,7 +886,7 @@ function pRequests(){
       ${R.autoNowPlaying?'<div class="hint">Updates automatically from RadioDJ via Iono.fm. Type below only to correct it.</div>':''}
       ${ro?'':`<form id="npForm" class="frow" style="margin-top:14px"><div><input id="npT" placeholder="Song title" maxlength="120" required></div>
         <div><input id="npA" placeholder="Artist" maxlength="120"></div><div style="flex:0 0 auto"><button class="btn" id="npB">Set</button></div></form>`}
-      ${R.recent.length>1?`<div class="lbl-sm" style="margin-top:16px">Recently played</div>${R.recent.slice(1,6).map(p=>`<div class="played">${pic(p.art)}<div class="t"><b>${esc(p.title)}</b><span>${esc(p.artist)}</span></div><div class="tm">${esc(p.at)}</div></div>`).join('')}`:''}
+      ${R.recent.length?`<div class="lbl-sm" style="margin-top:16px">Recently played</div>${R.recent.slice(0,5).map(p=>`<div class="played">${pic(p.art)}<div class="t"><b>${esc(p.title)}</b><span>${esc(p.artist)}</span></div><div class="tm">${esc(p.at)}</div></div>`).join('')}`:''}
     </div>
     <div class="card"><h3>Send a Request <span class="vbadge">✔ VERIFIED</span></h3>
       ${ro?'<div class="hint" style="margin:0">Not available while suspended.</div>':`<form id="lrForm">

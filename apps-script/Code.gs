@@ -32,7 +32,7 @@ const SHEETS = {
   Reviews: ['ID', 'BookingID', 'Date', 'Show', 'HostEmail', 'Emails', 'Music', 'Mic', 'Engagement', 'Imaging',
             'Comments', 'By', 'CreatedAt'],
   Listener: ['ID', 'Name', 'Type', 'Message', 'Source', 'Email', 'Verified', 'Status', 'Pinned', 'CreatedAt'],
-  Played: ['ID', 'Title', 'Artist', 'Art', 'PlayedAt', 'By'],
+  Played: ['ID', 'Title', 'Artist', 'Art', 'PlayedAt', 'By', 'Duration', 'StartMs'],
   Settings: ['Key', 'Value']
 };
 const LISTENER_TYPES = ['Request', 'Shoutout', 'Traffic', 'Joke', 'Competition', 'Other'];
@@ -55,6 +55,7 @@ const TEXT_COLS = {
 /* ───────────────────────── Web app & sheet menu ───────────────────────── */
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.xpwd !== undefined) return text_(radioDJ_(e.parameter));
   const p = e && e.parameter && e.parameter.p;
   if (p === 'listen') {
     return HtmlService.createHtmlOutputFromFile('Public')
@@ -382,6 +383,7 @@ function getManagement(token) {
   const hrLog = me.Role === 'Manager' ? hr.sort(byDesc_('CreatedAt')).map(function (h) {
     return { email: h.Email, name: h.Name, type: h.Type, details: h.Details, date: h.Date, by: h.By, created: h.CreatedAt };
   }) : [];
+  if (me.Role === 'Manager') s.radiodj = radiodjInfo_();
   return { me: publicUser_(me), staff: staff, requests: requests, hours: recentHours, schedule: schedule,
            live: live_(books), hr: hrLog, hrTypes: ['Warning', 'Note'],
            settings: s, roles: ROLES, areas: AREAS, isManager: me.Role === 'Manager', today: today };
@@ -1043,8 +1045,9 @@ function getListenerRequests(token) {
       return { id: r.ID, name: r.Name, type: r.Type, message: r.Message, source: r.Source, verified: isTrue_(r.Verified),
                status: r.Status, pinned: isTrue_(r.Pinned), created: r.CreatedAt };
     });
-  syncIono_();
-  return { list: list, types: LISTENER_TYPES, nowPlaying: nowPlaying_(), recent: played_(10), autoNowPlaying: !!settings_().ionoStream,
+  const n = publicNow();
+  return { list: list, types: LISTENER_TYPES, nowPlaying: n.np, recent: n.recent,
+           autoNowPlaying: !!settings_().ionoStream || !!props_().getProperty('NP_PUSH_AT'),
            publicUrl: publicUrl_(), readOnly: u.Status === 'Suspended' };
 }
 
@@ -1069,40 +1072,140 @@ function setNowPlaying(token, o) {
   const title = String(o.title || '').trim().slice(0, 120);
   const artist = String(o.artist || '').trim().slice(0, 120);
   if (!title) throw new Error('Enter the song title.');
-  const art = lookupArt_(title, artist);
-  withLock_(function () {
-    append_('Played', { ID: id_(), Title: title, Artist: artist, Art: art, PlayedAt: nowSec_(), By: u.Name });
-  });
+  startSong_({ title: title, artist: artist, source: u.Name });
   return getListenerRequests(token);
 }
-function lookupArt_(title, artist) {
+
+/* ───────────────────────── Live song engine ─────────────────────────
+ * The current song comes from Iono.fm (which gets it from the playout system with the stream), or instantly when
+ * the playout system (Myriad, RadioDJ, …) sends each track straight to this web app.
+ * The current song is kept in Script Properties so listener pages can read it in a fraction of a second,
+ * and every song is also logged to the "Played" sheet. When a song finishes it moves to "recently played"
+ * (newest on top, 5 at most). Song art and length come from Apple Music. */
+const RECENT_MAX = 5;
+function props_() { return PropertiesService.getScriptProperties(); }
+function npGet_() { try { return JSON.parse(props_().getProperty('NP') || 'null'); } catch (e) { return null; } }
+function recentGet_() { try { return JSON.parse(props_().getProperty('NP_RECENT') || '[]'); } catch (e) { return []; } }
+function sameSong_(a, b) {
+  return a && b && String(a.title).toLowerCase() === String(b.title).toLowerCase() &&
+         String(a.artist).toLowerCase() === String(b.artist).toLowerCase();
+}
+function parseDur_(v) {
+  const t = String(v == null ? '' : v).trim();
+  if (!t || t.indexOf('$') >= 0) return 0;
+  const parts = t.split(':').map(Number);
+  if (parts.some(isNaN)) return 0;
+  const secs = parts.reduce(function (a, n) { return a * 60 + n; }, 0);
+  return secs > 20 && secs < 3600 ? Math.round(secs) : 0;   // ignore jingles/nonsense
+}
+function lookupSong_(title, artist) {
   try {
     const url = 'https://itunes.apple.com/search?entity=song&limit=1&country=ZA&term=' +
                 encodeURIComponent((artist + ' ' + title).trim());
     const res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-    if (res.getResponseCode() !== 200) return '';
-    const j = JSON.parse(res.getContentText());
-    const a = j.results && j.results[0] && j.results[0].artworkUrl100;
-    return a ? a.replace('100x100bb', '600x600bb') : '';
-  } catch (e) { return ''; }
+    if (res.getResponseCode() !== 200) return {};
+    const r = (JSON.parse(res.getContentText()).results || [])[0];
+    if (!r) return {};
+    return { art: r.artworkUrl100 ? r.artworkUrl100.replace('100x100bb', '600x600bb') : '',
+             duration: r.trackTimeMillis ? Math.round(r.trackTimeMillis / 1000) : 0 };
+  } catch (e) { return {}; }
 }
-function played_(n) {
-  return rows_('Played').sort(byDesc_('PlayedAt')).slice(0, n).map(function (p) {
-    return { title: p.Title, artist: p.Artist, art: p.Art, at: String(p.PlayedAt).slice(11, 16), date: String(p.PlayedAt).slice(0, 10) };
+function lookupArt_(title, artist) { return lookupSong_(title, artist).art || ''; }
+
+/** o: {title, artist, art?, duration?, source}. Returns the current song. */
+function startSong_(o) {
+  const now = Date.now();
+  const started = Number(o.startMs) > now - 15 * 60000 && Number(o.startMs) < now + 60000 ? Number(o.startMs) : now;
+  const song = { id: id_(), title: String(o.title).slice(0, 120), artist: String(o.artist || '').slice(0, 120),
+                 art: o.art || '', duration: Number(o.duration) || 0, startMs: started, source: o.source || '' };
+  let isNew = false;
+  withLock_(function () {
+    const cur = npGet_();
+    if (cur && sameSong_(cur, song) && now - cur.startMs < ((cur.duration || 480) + 30) * 1000) { song.id = ''; return; }
+    if (cur) props_().setProperty('NP_RECENT', JSON.stringify([cur].concat(recentGet_()).slice(0, RECENT_MAX)));
+    props_().setProperty('NP', JSON.stringify(song));                     // live straight away…
+    isNew = true;
   });
+  if (!isNew) return npGet_();
+  if (!song.art || !song.duration) {                                       // …then fill in artwork and length
+    const info = lookupSong_(song.title, song.artist);
+    withLock_(function () {
+      const cur = npGet_();
+      if (!cur || cur.id !== song.id) return;
+      cur.art = cur.art || info.art || ''; cur.duration = cur.duration || info.duration || 0;
+      props_().setProperty('NP', JSON.stringify(cur));
+      song.art = cur.art; song.duration = cur.duration;
+    });
+  }
+  withLock_(function () {
+    append_('Played', { ID: song.id, Title: song.title, Artist: song.artist, Art: song.art, PlayedAt: nowSec_(),
+                        By: song.source, Duration: song.duration || '', StartMs: song.startMs });
+  });
+  return song;
 }
-function nowPlaying_() { const p = played_(1)[0]; return p && p.date === today_() ? p : null; }
+
+/** Called by the playout system (GET or POST) with xpwd, artist, title, and optionally duration and track-type */
+function radioDJ_(p) {
+  const key = settingsRaw_('RadioDJKey');
+  if (!key || String(p.xpwd || '') !== key) return 'Wrong key';
+  if (p.event && String(p.event).toLowerCase() !== 'song') return 'Skipped: ' + p.event;
+  const clean = function (v) { v = String(v == null ? '' : v).trim(); return v.charAt(0) === '$' ? '' : v; };
+  const type = clean(p['track-type'] || p.tracktype || p.type).toLowerCase();
+  if (type && type !== '0' && type.indexOf('music') < 0 && type.indexOf('song') < 0) return 'Skipped: not music (' + type + ')';
+  let title = clean(p.title), artist = clean(p.artist);
+  if (title && !artist && title.indexOf(' - ') > 0) {                     // auto title mode: "Artist - Title"
+    artist = title.slice(0, title.indexOf(' - ')).trim(); title = title.slice(title.indexOf(' - ') + 3).trim();
+  }
+  if (!title || !artist) return 'Skipped: no artist/title';
+  if ((title + ' ' + artist).toLowerCase().indexOf('kovsie') >= 0) return 'Skipped: station imaging';
+  props_().setProperty('NP_PUSH_AT', String(Date.now()));
+  const s = startSong_({ title: title, artist: artist, duration: parseDur_(p.duration), source: 'Playout' });
+  return 'OK: ' + s.artist + ' - ' + s.title;
+}
+function text_(t) { return ContentService.createTextOutput(String(t)).setMimeType(ContentService.MimeType.TEXT); }
+
+function songOut_(x) {
+  return x ? { id: x.id, title: x.title, artist: x.artist, art: x.art || '', duration: x.duration || 0, startMs: x.startMs,
+               at: Utilities.formatDate(new Date(x.startMs), tz_(), 'HH:mm') } : null;
+}
+/** Lightweight: what's playing now + the last 5 finished songs */
+function publicNow() {
+  syncIono_();
+  const now = Date.now();
+  const cur = npGet_();
+  let recent = recentGet_(), playing = cur;
+  const limit = cur ? (cur.duration ? cur.duration * 1000 + 4000 : 8 * 60000) : 0;
+  if (cur && now - cur.startMs > limit) { playing = null; recent = [cur].concat(recent); }   // finished, nothing new yet
+  return { np: songOut_(playing), recent: recent.slice(0, RECENT_MAX).map(songOut_), serverNow: now };
+}
+function nowPlaying_() { return publicNow().np; }
+function played_(n) { return publicNow().recent.slice(0, n); }
+
+/** Settings: RadioDJ connection details (Manager only) */
+function radiodjInfo_() {
+  let key = settingsRaw_('RadioDJKey');
+  if (!key) { key = Utilities.getUuid().split('-').join('').slice(0, 16); setSetting_('RadioDJKey', key); }
+  let url = '';
+  try { url = ScriptApp.getService().getUrl(); } catch (e) {}
+  const pushAt = Number(props_().getProperty('NP_PUSH_AT') || 0);
+  return { url: url, key: key, lastPush: pushAt ? Utilities.formatDate(new Date(pushAt), tz_(), 'yyyy-MM-dd HH:mm:ss') : '' };
+}
+function newRadioDJKey(token) {
+  auth_(token, ['Manager']);
+  setSetting_('RadioDJKey', Utilities.getUuid().split('-').join('').slice(0, 16));
+  return getManagement(token);
+}
 
 /* ───────────────────────── Public listener site (?p=listen) ───────────────────────── */
 
 function publicGetState() {
   const s = settings_();
-  syncIono_();
   const live = live_(rows_('Bookings'));
   const strip = function (o) { return o ? { show: o.show, name: o.name, with: o.with, start: o.start, end: o.end,
     date: o.date, image: o.image, startMs: o.startMs, endMs: o.endMs } : null; };
-  return { onAir: live.onAir.map(strip), next: strip(live.next), nowPlaying: nowPlaying_(), recent: played_(15),
-           streamUrl: s.streamUrl, types: LISTENER_TYPES, serverNow: Date.now() };
+  const n = publicNow();
+  return { onAir: live.onAir.map(strip), next: strip(live.next), nowPlaying: n.np, recent: n.recent,
+           streamUrl: s.streamUrl, types: LISTENER_TYPES, serverNow: n.serverNow };
 }
 
 function publicUrl_() {
@@ -1133,23 +1236,21 @@ function fetchIono_(id) {
 function syncIono_() {
   const id = settings_().ionoStream;
   if (!id) return;
+  if (Date.now() - Number(props_().getProperty('NP_PUSH_AT') || 0) < 15 * 60000) return;  // playout system is sending directly
   const cache = CacheService.getScriptCache();
   if (cache.get('iono')) return;
-  cache.put('iono', '1', 30);
+  cache.put('iono', '1', 16);                                          // Iono.fm asks for no more than one check per 15s
   try {
     const j = fetchIono_(id);
     if (!j || j.off || j.error) return;
     const event = String(j.event || 'song').toLowerCase();
     const title = String(j.title || '').trim(), artist = String(j.artist || '').trim();
-    if (event !== 'song' || !title || !artist) return;                          // skip ads, news, jingles without an artist
-    if (/kovsie/i.test(title + ' ' + artist) || /(^|\W)ad(\W|$)/i.test(title)) return; // station imaging / ads
-    const last = rows_('Played').sort(byDesc_('PlayedAt'))[0];
-    if (last && String(last.Title).toLowerCase() === title.toLowerCase() &&
-        String(last.Artist).toLowerCase() === artist.toLowerCase()) return;   // same song still playing
-    const art = (j.artwork && String(j.artwork).indexOf('http') === 0) ? String(j.artwork) : lookupArt_(title, artist);
-    withLock_(function () {
-      append_('Played', { ID: id_(), Title: title.slice(0, 120), Artist: artist.slice(0, 120), Art: art, PlayedAt: nowSec_(), By: 'Iono.fm' });
-    });
+    if (event !== 'song' || !title || !artist) return;
+    const low = (title + ' ' + artist).toLowerCase();
+    if (low.indexOf('kovsie') >= 0 || (' ' + title.toLowerCase() + ' ').indexOf(' ad ') >= 0) return;
+    let dt = j.dt; if (typeof dt === 'number' && dt < 1e12) dt *= 1000; else if (typeof dt === 'string') dt = Date.parse(dt);
+    startSong_({ title: title, artist: artist, duration: parseDur_(j.duration), startMs: dt,
+                 art: (j.artwork && String(j.artwork).indexOf('http') === 0) ? String(j.artwork) : '', source: 'Iono.fm' });
   } catch (e) { /* network hiccup — try again on the next check */ }
 }
 /** Settings → "Test" button */
@@ -1176,9 +1277,11 @@ const API_FUNCTIONS = {
   saveSettings: saveSettings, testIono: testIono,
   getLive: getLive, getPulse: getPulse, getNotifications: getNotifications, markNotificationsRead: markNotificationsRead,
   staffSendRequest: staffSendRequest, getListenerRequests: getListenerRequests, updateListenerRequest: updateListenerRequest,
-  setNowPlaying: setNowPlaying, publicGetState: publicGetState, publicSendRequest: publicSendRequest
+  setNowPlaying: setNowPlaying, publicGetState: publicGetState, publicSendRequest: publicSendRequest,
+  publicNow: publicNow, newRadioDJKey: newRadioDJKey
 };
 function doPost(e) {
+  if (e && e.parameter && e.parameter.xpwd !== undefined) return text_(radioDJ_(e.parameter));   // RadioDJ Web Export
   let out;
   try {
     const body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
