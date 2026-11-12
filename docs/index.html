@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KovsieX Experience</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23d6339c'/%3E%3Ctext x='16' y='22' font-size='17' font-family='Arial' font-weight='700' fill='white' text-anchor='middle'%3EX%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1c26; --bg2:#132430; --side:#1a2a35; --card:#1b3443; --card-h:#1d3a4a; --line:#2d4c5c; --field:#16303d;
+  --ink:#e7eef3; --muted:#9db2c0; --dim:#6f8796;
+  --pink:#e25bc8; --pink2:#d6339c; --blue:#3e9df5; --blue2:#62b0f7;
+  --ok:#3cc48f; --warn:#f0a35e; --bad:#e5484d;
+  --okbg:#3cc48f22; --warnbg:#f0a35e22; --badbg:#e5484d26; --infobg:#3e9df522;
+  --r:4px; --side-w:230px;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;font-family:Nunito,'Segoe UI',system-ui,sans-serif;color:var(--ink);font-size:14.5px;line-height:1.5;
+  background:linear-gradient(160deg,#162733 0%,#0f1c26 55%,#0c1820 100%) fixed}
+h1,h2,h3{margin:0;font-weight:600}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--pink)}
+.hidden{display:none!important}
+
+/* ── Fields ── */
+label{display:block;font-size:14px;margin:14px 0 6px;color:var(--ink)}
+label.rq::before{content:'* ';color:var(--bad)}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid #3d5c6c;border-radius:var(--r);background:var(--field);color:var(--ink)}
+input::placeholder,textarea::placeholder{color:var(--dim)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pink2);box-shadow:0 0 0 2px #d6339c33}
+input[type=date],input[type=time]{color-scheme:dark}
+select option{background:#1b3443;color:var(--ink)}
+textarea{resize:vertical;min-height:80px}
+.switch{position:relative;display:inline-block;width:44px;height:22px;flex:none}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;background:#3a5160;border-radius:22px;cursor:pointer;transition:.2s}
+.switch span::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s}
+.switch input:checked+span{background:var(--pink2)}
+.switch input:checked+span::before{transform:translateX(22px)}
+.switch-row{display:flex;align-items:center;gap:12px;margin-top:6px}
+label.check{display:flex;gap:9px;align-items:flex-start;margin-top:14px;cursor:pointer}
+label.check input{width:auto;margin-top:3px}
+
+/* ── Buttons ── */
+.btn{border:0;border-radius:var(--r);padding:8px 16px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff;font-size:14px}
+.btn:hover{background:var(--blue2)}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.full{width:100%;margin-top:18px;padding:11px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid #3d5c6c}
+.btn.ghost:hover{border-color:var(--pink2);color:#fff}
+.btn.light{background:#fff;color:#1b3443}
+.btn.light:hover{background:#e8eef2}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn.ok{background:#2fa874} .btn.ok:hover{background:var(--ok)}
+.btn.bad{background:#c93b40} .btn.bad:hover{background:var(--bad)}
+.linkbtn{background:none;border:0;color:var(--blue2);cursor:pointer;padding:0}
+
+/* ── Login ── */
+.login{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:30px;box-shadow:0 30px 60px #0006}
+.wordmark{font-weight:700;letter-spacing:.14em;font-size:20px;color:#fff;text-transform:uppercase;white-space:nowrap}
+.wordmark sup{font-size:10px;letter-spacing:.12em;margin-left:3px;color:var(--muted);vertical-align:super}
+.login-card .wordmark{display:block;text-align:center;margin-bottom:6px}
+.stars{text-align:center;color:var(--dim);letter-spacing:.6em;margin:6px 0 18px}
+.err{color:#ff8a8d;margin-top:12px;font-size:13px;min-height:18px}
+.hint{color:var(--muted);font-size:12.5px;margin-top:12px}
+
+/* ── Shell ── */
+.shell{display:flex;min-height:100vh;background:linear-gradient(90deg,#1c2d38 0,#1c2d38 var(--side-w),transparent var(--side-w))}
+.side{width:var(--side-w);flex:none;background:linear-gradient(180deg,#1b2c37,#1a2a35 60%,#223541);position:sticky;top:0;height:100vh;overflow-y:auto;padding:0 18px 30px;z-index:20}
+.side .wordmark{display:block;text-align:center;padding:26px 0 22px;border-bottom:1px solid var(--line)}
+.nav-sec{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#cfdbe3;margin:18px 0 6px}
+.nav-sep{border-top:1px solid var(--line);margin:12px 0}
+.nav-item{display:flex;align-items:center;gap:10px;width:calc(100% + 36px);margin:0 -18px;padding:11px 18px;border:0;background:none;color:#dfe8ee;font-size:14px;cursor:pointer;text-align:left}
+.nav-item svg{width:16px;height:16px;flex:none;opacity:.9}
+.nav-item:hover{background:#ffffff0d}
+.nav-item.on{background:linear-gradient(90deg,#4a2c55,#3a2a45 60%,transparent);color:#fff;font-weight:700}
+.nav-item .count{margin-left:auto;background:var(--bad);color:#fff;border-radius:99px;font-size:11px;padding:0 7px;font-weight:700}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:64px;display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:0 22px;background:#172833cc;backdrop-filter:blur(6px);position:sticky;top:0;z-index:10;border-bottom:1px solid #ffffff08}
+.topbar .menu{display:none;margin-right:auto}
+.tb-item{display:flex;align-items:center;gap:8px;padding:0 14px;height:40px;border-left:1px solid var(--line);color:var(--muted);font-size:13px}
+.tb-item:first-of-type{border-left:0}
+.tb-item.pop-wrap{border-left:0;padding:0 4px}
+.tb-clock{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+.iconbtn{background:#ffffff0d;border:0;color:var(--ink);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.iconbtn:hover{background:#ffffff1a}
+.iconbtn svg{width:17px;height:17px}
+.me{display:flex;align-items:center;gap:10px;cursor:pointer;position:relative}
+.me .avatar{width:34px;height:34px;font-size:13px}
+.menu-pop{position:absolute;right:0;top:46px;background:var(--card);border:1px solid var(--line);border-radius:6px;min-width:190px;box-shadow:0 16px 40px #0008;padding:6px 0}
+.menu-pop button{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 14px;color:var(--ink);cursor:pointer}
+.menu-pop button:hover{background:#ffffff0d}
+.menu-pop .who{padding:8px 14px 10px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12.5px}
+.menu-pop .who b{color:var(--ink);display:block;font-size:14px}
+.wrap{padding:24px 28px 40px;max-width:1240px;width:100%}
+.foot{margin-top:auto;padding:20px;text-align:center;color:var(--muted);font-size:12.5px;background:#ffffff05}
+.scrim{display:none}
+@media(max-width:900px){
+  .side{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .2s}
+  .side.open{transform:none;box-shadow:20px 0 50px #0008}
+  .scrim.open{display:block;position:fixed;inset:0;background:#0008;z-index:15}
+  .topbar .menu{display:grid}
+  .wrap{padding:18px 16px 30px}
+  .tb-item.hide-sm,.hide-sm{display:none}
+  .shell{background:none}
+  .tb-item{padding:0 10px;white-space:nowrap}
+}
+.page-h{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.page-h h1{font-size:22px}
+.page-h p{margin:3px 0 0;color:var(--muted);font-size:13.5px}
+
+/* ── Cards ── */
+.grid{display:grid;gap:18px}
+.g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:1.25fr 1fr} .g2e{grid-template-columns:1fr 1fr}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g2,.g2e{grid-template-columns:1fr}}
+@media(max-width:480px){.g4{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 22px;box-shadow:0 2px 12px #0003}
+.card>h3:first-child,.card-h{margin:-18px -22px 18px;padding:16px 22px;border-bottom:1px solid var(--line);background:var(--card-h);font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:10px;border-radius:var(--r) var(--r) 0 0}
+.card-h .clock-sm{font-variant-numeric:tabular-nums;font-weight:600}
+.card.flush{padding:0}
+.card.flush .card-h{margin:0}
+.card-b{padding:18px 22px}
+.stat .k{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.stat .v{font-size:30px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:15px;font-weight:500;color:var(--muted)}
+.stat .s{color:var(--muted);font-size:12.5px;margin-top:4px}
+.stat.hero{background:linear-gradient(135deg,#4a2c55,#2b3550 70%);border-color:#5b3a68}
+.stat.hero .k,.stat.hero .s,.stat.hero .v small{color:#d9c7e2}
+.bar{height:6px;border-radius:9px;background:#ffffff1f;margin-top:12px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%;background:var(--pink)}
+.good{color:var(--ok)} .warnc{color:var(--warn)}
+.kv{display:grid;gap:10px}
+.kv div{display:flex;gap:6px}
+.kv b{color:#fff}
+
+.weeks{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:10px}
+.wk{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.wk .track{position:relative;width:100%;max-width:36px;flex:1}
+.wk .col{position:absolute;bottom:0;left:0;right:0;border-radius:3px 3px 0 0;background:var(--blue);min-height:3px}
+.wk .col.short{background:var(--warn)}
+.wk .col.cur{background:var(--pink)}
+.wk .col.pend{background:#e25bc844}
+.wk .tgt{position:absolute;left:-4px;right:-4px;border-top:2px dashed #fff;opacity:.35}
+.wk span{font-size:11px;color:var(--muted)}
+.wk b{font-size:11.5px}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.frow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.frow>div{flex:1 1 140px}.frow>div.wide{flex:2 1 220px}
+@media(max-width:560px){.row2,.row3{grid-template-columns:1fr}}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:14px;font-weight:600;padding:12px 14px;border-bottom:1px solid var(--line);color:var(--ink)}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl{overflow-x:auto}
+.tbl table{border-bottom:1px solid #6c8796}
+.empty{color:var(--dim);padding:18px 4px;text-align:center}
+.pinktxt{color:var(--pink)}
+.linkicon{color:var(--pink);margin-right:6px}
+
+.badge{display:inline-block;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+.b-ok{background:var(--okbg);color:var(--ok);border-color:#3cc48f55}
+.b-warn{background:var(--warnbg);color:var(--warn);border-color:#f0a35e55}
+.b-bad{background:var(--badbg);color:#ff8a8d;border-color:#e5484d66}
+.b-info{background:#e25bc822;color:var(--pink);border-color:#e25bc855}
+.b-mute{background:transparent;color:var(--muted);border-color:#4d6a79}
+
+.tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:10px 18px;cursor:pointer;font-weight:500;color:var(--ink);border-bottom:2px solid transparent;margin-bottom:-1px;font-size:15px}
+.tabs button.on{border-bottom-color:var(--pink2)}
+.tabs .count{background:var(--bad);color:#fff;border-radius:99px;padding:0 6px;margin-left:5px;font-size:11px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters input,.filters select{width:auto;min-width:180px}
+
+.req{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;background:#18303e;border-left:4px solid #2d4c5c}
+.req-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.req p{margin:8px 0;color:#d5e0e7}
+.req .meta{color:var(--muted);font-size:12.5px}
+.act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.req .act input{flex:1;min-width:180px;width:auto}
+.steps{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:6px}
+.steps .dot{width:8px;height:8px;border-radius:50%;background:#4d6a79}
+.steps .dot.done{background:var(--ok)} .steps .dot.now{background:var(--warn)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#e25bc822;color:var(--pink);border:1px solid #e25bc855;border-radius:4px;padding:3px 4px 3px 10px;font-weight:600;font-size:12.5px;display:inline-flex;align-items:center;gap:4px}
+.chip button{border:0;background:transparent;color:var(--pink);cursor:pointer;font-size:15px;line-height:1;padding:0 4px}
+.slot{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.slot:last-child{border-bottom:0}
+.slot .when{min-width:100px;display:flex;flex-direction:column}
+.slot .when span{color:var(--muted);font-size:12.5px}
+.slot .what{flex:1}
+.slot .what b.pinktxt{font-weight:600}
+.slot.past{opacity:.7}
+.day-h{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 2px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.day-h:first-child{margin-top:0}
+
+.extra{border:1px solid var(--line);background:#18303e;border-radius:var(--r);margin-top:20px}
+.extra-h{display:flex;justify-content:space-between;padding:13px 18px;background:var(--card-h);border-bottom:1px solid var(--line)}
+.extra-b{padding:4px 18px 18px}
+.av-pick{display:flex;align-items:center;gap:14px;margin-top:4px;flex-wrap:wrap}
+.av-thumb{width:64px;height:64px;border-radius:4px;object-fit:cover;background:#0f1c26;border:1px solid var(--line)}
+
+/* ── On air ── */
+.onair{display:inline-flex;align-items:center;gap:8px;background:var(--bad);color:#fff;font-weight:800;font-size:12px;letter-spacing:.12em;padding:4px 10px;border-radius:4px}
+.onair i{width:8px;height:8px;border-radius:50%;background:#fff;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.offair{display:inline-block;background:#ffffff14;color:var(--muted);font-weight:800;font-size:12px;letter-spacing:.12em;padding:4px 10px;border-radius:4px;border:1px solid #4d6a79}
+.sv{display:flex;gap:20px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);background:#18303e;border-radius:var(--r);padding:18px}
+.sv-img{width:118px;height:118px;border-radius:6px;object-fit:cover;flex:none;background:#0f1c26}
+.sv-ph{width:118px;height:118px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:34px;font-weight:800;color:#fff;background:linear-gradient(135deg,#d6339c,#4a2c55 60%,#1d3a4a)}
+.sv-info{flex:1;min-width:190px}
+.sv-name{font-size:15px;color:#fff}
+.sv-show{color:var(--pink);font-size:19px;font-weight:600;margin:2px 0}
+.sv-time{font-style:italic;color:#dfe8ee}
+.sv-with{color:var(--muted);font-size:13px;margin-top:2px}
+.sv-timers{display:flex;gap:10px;flex-wrap:wrap}
+.tbox{min-width:126px;text-align:center;border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;background:#132a36}
+.tval{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.01em;color:#fff}
+.tbox.now .tval{color:var(--pink)}
+.tlbl{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.prog{height:5px;background:#ffffff14;border-radius:9px;overflow:hidden;margin-top:14px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--pink2),var(--pink))}
+.upnext{display:flex;align-items:center;gap:12px;margin-top:14px;color:var(--muted);font-size:13.5px}
+.upnext img,.upnext .ph{width:40px;height:40px;border-radius:4px;object-fit:cover;flex:none}
+.upnext .ph{display:grid;place-items:center;font-weight:800;color:#fff;background:linear-gradient(135deg,#d6339c,#4a2c55)}
+.upnext b{color:var(--ink)}
+.offmsg{font-size:17px;font-weight:600;margin-bottom:12px}
+.lbl-sm{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+
+/* ── People / HR ── */
+.person{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.person:last-child{border-bottom:0}
+.person .who2{display:flex;gap:12px;align-items:center;min-width:220px;flex:1}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#d6339c,#4a2c55);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;flex:none}
+.profile{display:flex;gap:18px;align-items:center}
+.profile .big{width:96px;height:96px;border-radius:6px;font-size:32px;display:grid;place-items:center;font-weight:800;color:#fff;background:linear-gradient(135deg,#d6339c,#4a2c55 65%,#1d3a4a)}
+.hr-item{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:10px 0}
+.hr-item.Warning,.hr-item.Suspended{border-color:var(--warn)} .hr-item.Terminated{border-color:var(--bad)}
+.hr-item.Hired,.hr-item.Reinstated{border-color:var(--ok)}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.seg button{border:1px solid #3d5c6c;background:transparent;border-radius:var(--r);padding:6px 12px;cursor:pointer;font-weight:600;color:var(--ink)}
+.seg button.on{background:var(--pink2);border-color:var(--pink2);color:#fff}
+.seg button.danger.on{background:var(--bad);border-color:var(--bad)}
+
+.modal{position:fixed;inset:0;background:#050b10b3;display:grid;place-items:center;padding:20px;z-index:40}
+.modal .card{max-width:440px;width:100%}
+.modal .card.wide{max-width:660px;max-height:90vh;overflow:auto}
+.pw{font-size:22px;font-weight:700;background:#0f1c26;color:var(--pink);padding:12px;border-radius:var(--r);text-align:center;letter-spacing:.06em;margin:12px 0;user-select:all;border:1px solid var(--line)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#24414f;color:#fff;padding:11px 18px;border-radius:var(--r);z-index:50;box-shadow:0 10px 30px #0006;max-width:90vw;border-left:4px solid var(--ok)}
+.toast.bad{border-left-color:var(--bad)}
+.preview{background:var(--pink2);color:#fff;text-align:center;font-size:12.5px;font-weight:700;padding:6px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #fff6;border-top-color:#fff;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px}
+.loader{width:42px;height:42px;border:3px solid #e5484d33;border-top-color:var(--bad);border-radius:50%;animation:s .8s linear infinite;margin:40px auto}
+@keyframes s{to{transform:rotate(360deg)}}
+.loading{padding:40px;text-align:center;color:var(--muted)}
+@media(max-width:900px){
+  .sv{gap:14px;padding:14px}
+  .sv-img,.sv-ph{width:84px;height:84px}
+  .sv-info{min-width:0;flex:1 1 150px}
+  .sv-timers{width:100%}
+  .tbox{flex:1 1 0;min-width:0;padding:8px 4px}
+  .tval{font-size:20px}
+  .tlbl{font-size:10px}
+  .card{padding:16px}
+  .card>h3:first-child,.card-h{margin:-16px -16px 16px;padding:14px 16px}
+  .card.flush .card-h{margin:0}
+  .card-b{padding:16px}
+}
+.pop-wrap{position:relative}
+.iconbtn{position:relative}
+.dotcount{position:absolute;top:-3px;right:-3px;background:var(--bad);color:#fff;border-radius:99px;font-size:10.5px;font-weight:800;min-width:18px;height:18px;padding:0 5px;display:grid;place-items:center;border:2px solid #172833}
+.menu-pop.notif{width:360px;max-width:calc(100vw - 24px);max-height:460px;overflow:auto;padding:0}
+.menu-pop.links{width:290px;padding:0}
+.pop-h{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);font-weight:700;background:var(--card-h);position:sticky;top:0}
+.nitem{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.nitem:hover{background:#ffffff08}
+.nitem.unread{background:#e25bc810}
+.nitem .ni{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:14px;background:#ffffff12}
+.nitem .ni.Warning,.nitem .ni.Suspension{background:#f0a35e2a;color:var(--warn)}
+.nitem .ni.Review{background:#e25bc82a;color:var(--pink)}
+.nitem .ni.Leave{background:#3cc48f22;color:var(--ok)}
+.nitem .ni.Booking{background:#3e9df52a;color:var(--blue2)}
+.nitem b{display:block;font-size:13.5px;color:#fff}
+.nitem span{display:block;font-size:12.5px;color:var(--muted)}
+.nitem small{color:var(--dim);font-size:11.5px}
+.lk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
+.lk:hover{background:#ffffff08;color:#fff}
+.lk.off{color:var(--dim);cursor:default}
+.banner{display:flex;gap:12px;align-items:center;border:1px solid #f0a35e66;background:#f0a35e1c;color:#ffd7b0;border-radius:var(--r);padding:13px 16px;margin-bottom:18px}
+.banner.bad{border-color:#e5484d66;background:#e5484d1c;color:#ffc2c4}
+.warnmeter{display:flex;gap:6px;margin:10px 0 4px}
+.warnmeter i{flex:1;height:8px;border-radius:9px;background:#ffffff18}
+.warnmeter i.on{background:var(--warn)}
+.warnmeter.full i.on{background:var(--bad)}
+.lr{display:flex;gap:0;border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;background:#18303e;overflow:hidden}
+.lr .bar2{width:6px;background:#2d4c5c;flex:none}
+.lr.verified .bar2{background:var(--bad)}
+.lr .lr-b{flex:1;padding:14px 16px;min-width:0}
+.lr .lr-name{font-weight:700;font-size:15px;color:#fff}
+.lr.verified .lr-name{color:#ff6b70}
+.lr .lr-msg{margin:4px 0 8px;font-size:15px;word-wrap:break-word}
+.lr .lr-meta{color:var(--muted);font-size:13px}
+.lr.done{opacity:.55}
+.lr .lr-act{display:grid;grid-template-columns:auto auto;gap:6px;padding:14px;align-content:start}
+.sq{width:42px;height:28px;border:0;border-radius:3px;cursor:pointer;color:#fff;font-weight:800;font-size:13px}
+.sq.blue{background:#3e9df5} .sq.green{background:#3cc48f} .sq.red{background:#e5484d} .sq.grey{background:#4d6a79}
+.vbadge{display:inline-flex;align-items:center;gap:4px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;padding:1px 7px;border-radius:99px;margin-left:6px;letter-spacing:.03em;vertical-align:2px}
+.np{display:flex;gap:16px;align-items:center}
+.np img,.np .ph{width:88px;height:88px;border-radius:6px;object-fit:cover;flex:none}
+.np .ph{display:grid;place-items:center;background:linear-gradient(135deg,#d6339c,#4a2c55);font-size:30px}
+.np b{font-size:18px;display:block}
+.played{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.played:last-child{border-bottom:0}
+.played img,.played .ph{width:40px;height:40px;border-radius:3px;object-fit:cover;flex:none}
+.played .ph{display:grid;place-items:center;background:#ffffff12}
+.played .t{flex:1;min-width:0}
+.played .t b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.played .t span{color:var(--muted);font-size:12.5px}
+.played .tm{font-size:16px;font-variant-numeric:tabular-nums}
+.copyrow{display:flex;gap:8px;margin-top:8px}
+.copyrow input{flex:1;min-width:0}
+.rv-row{margin:14px 0 4px}
+.rv-row label{margin:0 0 6px}
+input[type=range]{padding:0;border:0;background:none;accent-color:#ffffff;height:24px}
+.ticks{display:flex;justify-content:space-between;color:var(--dim);font-size:12px;padding:0 4px}
+.info{display:flex;gap:12px;align-items:flex-start;background:var(--card-h);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;margin-bottom:18px;color:#d5e0e7;font-size:13.5px}
+</style>
+</head>
+<body>
+<div id="previewBar" class="preview hidden">Preview with demo data — sign in with any email/password. Live data appears once deployed from Apps Script.</div>
+
+<!-- LOGIN -->
+<section id="loginView" class="login">
+  <form class="login-card" id="loginForm" autocomplete="on" onsubmit="return false;">
+    <span class="wordmark">KovsieX<sup>Experience</sup></span>
+    <div class="stars">* * *</div>
+    <label for="lEmail">Email</label>
+    <input id="lEmail" type="email" required autocomplete="username" placeholder="you@example.com">
+    <label for="lPass">Password</label>
+    <input id="lPass" type="password" required autocomplete="current-password">
+    <button class="btn full" id="lBtn" type="submit">Login</button>
+    <div class="err" id="lErr"></div>
+    <div class="hint" style="text-align:center">Use the email and password your Manager gave you.<br>Forgotten it? Ask a Manager to reset it.<br><span style="opacity:.5">v10 · GitHub</span></div>
+  </form>
+</section>
+
+<!-- CHANGE PASSWORD -->
+<section id="pwView" class="login hidden">
+  <form class="login-card" id="pwForm" onsubmit="return false;">
+    <span class="wordmark">KovsieX<sup>Experience</sup></span>
+    <div class="stars">* * *</div>
+    <h2 style="font-size:18px;text-align:center" id="pwTitle">Choose your own password</h2>
+    <p class="hint" id="pwSub" style="margin-top:6px;text-align:center">You signed in with a temporary password. Set a new one to continue.</p>
+    <label>Current password</label><input id="pwCur" type="password" required autocomplete="current-password">
+    <label>New password (8+ characters)</label><input id="pwNew" type="password" required minlength="8" autocomplete="new-password">
+    <label>Repeat new password</label><input id="pwNew2" type="password" required minlength="8" autocomplete="new-password">
+    <button class="btn full" id="pwBtn" type="submit">Save password</button>
+    <button class="btn ghost full hidden" id="pwCancel" type="button" style="margin-top:8px">Cancel</button>
+    <div class="err" id="pwErr"></div>
+  </form>
+</section>
+
+<!-- APP -->
+<section id="appView" class="hidden">
+  <div class="shell">
+    <aside class="side" id="side">
+      <span class="wordmark">KovsieX<sup>Experience</sup></span>
+      <nav id="nav"></nav>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="iconbtn menu" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <div class="tb-item hide-sm"><span class="onair hidden" id="tbLive"><i></i>ON AIR</span></div>
+        <div class="tb-item"><span class="tb-clock" data-clock></span></div>
+        <div class="tb-item pop-wrap" id="linksWrap"><button class="iconbtn" id="linksBtn" aria-label="Useful links" title="Useful links"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
+          <div class="menu-pop links hidden" id="linksPop"></div></div>
+        <div class="tb-item pop-wrap" id="bellWrap"><button class="iconbtn" id="bellBtn" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="dotcount hidden" id="bellCount"></span></button>
+          <div class="menu-pop notif hidden" id="bellPop"></div></div>
+        <div class="tb-item me" id="meBtn"><div class="avatar" id="meAv"></div><span class="hide-sm" id="meName" style="color:var(--ink)"></span>
+          <div class="menu-pop hidden" id="mePop">
+            <div class="who"><b id="popName"></b><span id="popRole"></span></div>
+            <button id="chgPw">Change password</button>
+            <button id="logoutBtn">Sign out</button>
+          </div></div>
+      </header>
+      <main class="wrap" id="main"><div class="loader"></div></main>
+      <footer class="foot">KovsieX Experience · Staff portal</footer>
+    </div>
+  </div>
+</section>
+
+<div id="modalRoot"></div>
+<input type="file" id="filePick" accept="image/*" class="hidden">
+
+<script>
+window.addEventListener('error', function (e) {
+  var box = document.getElementById('jsErr');
+  if (!box) { box = document.createElement('div'); box.id = 'jsErr';
+    box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#5a1d22;color:#fff;border:1px solid #e5484d;border-radius:6px;padding:12px 14px;font:13px/1.4 system-ui,sans-serif';
+    document.body.appendChild(box); }
+  box.textContent = '[v10] Something went wrong on this page: ' + (e.message || e.error) + ' — please send this message to the portal admin.';
+});
+</script>
+<script>
+(function () {
+"use strict";
+const S = { token:null, user:null, page:'dash', mtab:'overview', dash:null, mgmt:null, f:{area:'',q:'',hq:''}, tt:0 };
+const CFG = window.KOVSIEX_CONFIG || {};
+const API_URL = String(CFG.apiUrl || '').trim();
+const LIVE = API_URL.indexOf('https:') === 0;
+const PUBLIC_URL = CFG.publicUrl || (location.origin + location.pathname.split('/').slice(0,-1).join('/') + '/listen.html');
+const store = { get(k){ try{ return sessionStorage.getItem(k); }catch(_){ return null; } },
+  set(k,v){ try{ sessionStorage.setItem(k,v); }catch(_){} }, del(k){ try{ sessionStorage.removeItem(k); }catch(_){} } };
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).split('').map(c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] || c)).join('');
+const fmtH = n => String(Math.round(Number(n||0)*100)/100);
+const fmtD = s => { if(!s) return ''; const d=new Date(String(s).slice(0,10)+'T12:00:00'); return isNaN(d)? s : d.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year: String(s).slice(0,4)===String(new Date().getFullYear())?undefined:'numeric'}); };
+const fmtDS = s => { if(!s) return ''; const p=String(s).slice(0,10).split('-'); return p.length===3? p[2]+'/'+p[1]+'/'+p[0].slice(2) : s; };
+const fmtT = (a,b) => `${a} – ${b}`;
+const dayName = d => new Date(d+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short'});
+const ini = n => String(n||'?').split(' ').filter(Boolean).map(x=>x[0]).slice(0,2).join('').toUpperCase();
+const isMgmt = () => S.user && S.user.role !== 'Staff';
+const TZ = 'Africa/Johannesburg';
+
+function api(fn, ...args){
+  if(!LIVE) return Mock.call(fn, args);
+  return fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({fn:fn, args:args}) })
+    .then(r => r.text().then(t => ({ok:r.ok, status:r.status, text:t})),
+          () => { throw new Error('Could not reach the KovsieX server. Check your internet connection and try again.'); })
+    .then(r => {
+      let j = null; try{ j = JSON.parse(r.text); }catch(_){}
+      if(!j) throw new Error(r.ok ? 'The KovsieX server sent an unexpected reply. A Manager should check the Apps Script is deployed with access set to Anyone.' : 'The KovsieX server returned an error ('+r.status+'). Please try again.');
+      if(!j.ok) throw new Error(j.error || 'Something went wrong.');
+      return j.result;
+    });
+}
+function call(fn, ...args){
+  return api(fn, S.token, ...args).catch(e => {
+    const m = (e && e.message) || String(e);
+    if (m.indexOf('SESSION_EXPIRED') >= 0){ toast('Your session expired — please sign in again.', true); showLogin(); throw e; }
+    toast(m.split('Error: ').join(''), true); throw e;
+  });
+}
+function toast(msg, bad){
+  const t=document.createElement('div'); t.className='toast'+(bad?' bad':''); t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), bad?5000:2800);
+}
+function busy(btn, on){ if(!btn) return; if(on){btn.dataset.t=btn.innerHTML;btn.innerHTML='<span class="spin"></span>';btn.disabled=true;} else {btn.innerHTML=btn.dataset.t||btn.innerHTML;btn.disabled=false;} }
+function statusBadge(s){
+  const m={'Approved':'b-ok','Declined':'b-bad','Cancelled':'b-mute','Pending Supervisor':'b-warn','Pending Manager':'b-info','Ended':'b-mute'};
+  return `<span class="badge ${m[s]||'b-mute'}">${esc(s)}</span>`;
+}
+
+function pickImage(){
+  return new Promise((resolve, reject) => {
+    const inp = $('filePick'); inp.value='';
+    inp.onchange = () => {
+      const f = inp.files && inp.files[0]; if(!f) return reject(new Error('none'));
+      if(String(f.type).indexOf('image')!==0) { toast('Please choose an image file.', true); return reject(new Error('type')); }
+      const r = new FileReader();
+      r.onload = () => { const img = new Image(); img.onload = () => {
+        const size = 480, c = document.createElement('canvas'); c.width = c.height = size;
+        const s = Math.min(img.width, img.height), sx = (img.width - s)/2, sy = (img.height - s)/2;
+        c.getContext('2d').drawImage(img, sx, sy, s, s, 0, 0, size, size);
+        resolve(c.toDataURL('image/jpeg', 0.8)); };
+        img.onerror = () => { toast('That image could not be read.', true); reject(new Error('read')); };
+        img.src = r.result; };
+      r.readAsDataURL(f);
+    };
+    inp.click();
+  });
+}
+
+function show(id){ ['loginView','pwView','appView'].forEach(v=>$(v).classList.toggle('hidden', v!==id)); }
+function showLogin(){ store.del('kx_token'); S.token=null; S.user=null; S.dash=null; S.mgmt=null; $('lPass').value=''; show('loginView'); }
+
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault(); $('lErr').textContent='';
+  const b=$('lBtn'); busy(b,true);
+  try{
+    const r = await api('login', $('lEmail').value, $('lPass').value);
+    S.token=r.token; S.user=r.user; store.set('kx_token', r.token);
+    if(r.mustChange){ openPw(true, $('lPass').value); } else { enterApp(); }
+  }catch(err){ $('lErr').textContent = ((err&&err.message)||String(err)).split('Error: ').join(''); }
+  busy(b,false);
+});
+function openPw(forced, cur){
+  $('pwCur').value = cur || ''; $('pwNew').value=''; $('pwNew2').value=''; $('pwErr').textContent='';
+  $('pwTitle').textContent = forced ? 'Choose your own password' : 'Change password';
+  $('pwSub').classList.toggle('hidden', !forced);
+  $('pwCancel').classList.toggle('hidden', forced);
+  show('pwView');
+}
+$('pwCancel').onclick = () => show('appView');
+$('pwForm').addEventListener('submit', async e => {
+  e.preventDefault(); $('pwErr').textContent='';
+  if($('pwNew').value !== $('pwNew2').value){ $('pwErr').textContent='The new passwords do not match.'; return; }
+  const b=$('pwBtn'); busy(b,true);
+  try{ await call('changePassword', $('pwCur').value, $('pwNew').value); toast('Password saved'); enterApp(); }
+  catch(err){ $('pwErr').textContent=((err&&err.message)||'').split('Error: ').join(''); }
+  busy(b,false);
+});
+$('meBtn').onclick = e => { if(e.target.closest('#mePop')) return; $('mePop').classList.toggle('hidden'); };
+document.addEventListener('click', e => {
+  if(!e.target.closest('#meBtn')) $('mePop').classList.add('hidden');
+  if(!e.target.closest('#bellWrap')) $('bellPop').classList.add('hidden');
+  if(!e.target.closest('#linksWrap')) $('linksPop').classList.add('hidden');
+});
+const RO = () => !!(S.user && S.user.status === 'Suspended');
+const NI = {Warning:'!', Suspension:'⏸', Review:'★', Leave:'✓', Booking:'♪'};
+function setUnread(n){ S.unread = n||0; const c=$('bellCount'); c.textContent = n>9?'9+':String(n); c.classList.toggle('hidden', !n); }
+$('bellBtn').onclick = async () => {
+  const pop=$('bellPop'); const open = pop.classList.contains('hidden');
+  pop.classList.toggle('hidden'); if(!open) return;
+  pop.innerHTML = '<div class="pop-h">Notifications</div><div class="loader" style="width:28px;height:28px;margin:20px auto"></div>';
+  try{
+    const r = await call('getNotifications');
+    pop.innerHTML = `<div class="pop-h">Notifications <span class="hint" style="margin:0;font-weight:400">${r.unread?r.unread+' new':''}</span></div>` +
+      (r.list.length ? r.list.map(n=>`<div class="nitem ${n.read?'':'unread'}" data-np="${esc(n.page)}"><div class="ni ${esc(n.type)}">${NI[n.type]||'•'}</div>
+        <div><b>${esc(n.title)}</b><span>${esc(n.body)}</span><small>${esc(n.created)}</small></div></div>`).join('') : '<div class="empty">Nothing yet.</div>');
+    pop.querySelectorAll('[data-np]').forEach(el=>el.onclick=()=>{ const pg=el.dataset.np; pop.classList.add('hidden');
+      if(pg && PAGES[pg] && (pg.indexOf('m:')!==0 || isMgmt())) go(pg); });
+    if(r.unread){ setUnread(0); api('markNotificationsRead', S.token).catch(()=>{}); }
+  }catch(_){ pop.classList.add('hidden'); }
+};
+$('linksBtn').onclick = () => {
+  const pop=$('linksPop'); pop.classList.toggle('hidden'); if(pop.classList.contains('hidden')) return;
+  const L = S.links || [];
+  pop.innerHTML = '<div class="pop-h">Useful links</div>' + (L.length ? L.map(l => l.url
+      ? `<a class="lk" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}<span>↗</span></a>`
+      : `<div class="lk off">${esc(l.label)}<span class="hint" style="margin:0">not set yet</span></div>`).join('') : '<div class="empty">No links yet.</div>')
+    + (S.user && S.user.role==='Manager' ? '<div class="lk" style="cursor:pointer;color:var(--blue2)" id="editLinks">Edit links in Settings</div>' : '');
+  const el=$('editLinks'); if(el) el.onclick=()=>{ pop.classList.add('hidden'); go('m:settings'); };
+};
+$('chgPw').onclick = () => { $('mePop').classList.add('hidden'); openPw(false); };
+$('logoutBtn').onclick = () => { api('logout', S.token).catch(()=>{}); showLogin(); };
+$('menuBtn').onclick = () => { $('side').classList.add('open'); $('scrim').classList.add('open'); };
+$('scrim').onclick = closeSide;
+function closeSide(){ $('side').classList.remove('open'); $('scrim').classList.remove('open'); }
+
+const IC = {
+  dash:'<path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Zm9-5v5l3 2"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  plus:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M12 10v7M8.5 13.5h7M8 3v4M16 3v4"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  plane:'<path d="M3 13l18-8-6 16-3-7-9-1Z"/>',
+  grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',
+  radio:'<circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/>',
+  inbox:'<path d="M3 13h5l2 3h4l2-3h5M5 5h14l2 8v6H3v-6Z"/>',
+  msg:'<path d="M4 5h16v11H8l-4 4Z"/><path d="M8 9h8M8 12h5"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>',
+  cog:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 6.6 19.6l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 2.9 14H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9.7 3V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.6 1.6 0 0 0 20.9 10H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z"/>'
+};
+const icon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+const PAGES = {
+  dash:['Dashboard','dash'], timetable:['Timetable','cal'], requests:['Requests','msg'], book:['Book a Slot','plus'], shows:['My Shows','mic'], leave:['Leave & Excuses','plane'],
+  'm:overview':['Overview','grid'], 'm:bookings':['Studio Bookings','radio'], 'm:requests':['Leave Approvals','inbox'], 'm:hours':['Extra Hours','clock'],
+  'm:people':['People & HR','users'], 'm:settings':['Settings','cog']
+};
+function renderNav(){
+  const pending = S.mgmt ? S.mgmt.requests.filter(r=>r.canAct).length : 0;
+  const item = k => `<button class="nav-item ${S.page===k?'on':''}" data-p="${k}">${icon(PAGES[k][1])}<span>${PAGES[k][0]}</span>${k==='m:requests'&&pending?`<span class="count">${pending}</span>`:''}</button>`;
+  let h = `<div style="height:8px"></div>${item('dash')}<div class="nav-sep"></div>
+    <div class="nav-sec">Radio</div>${item('timetable')}${item('requests')}${item('book')}${item('shows')}<div class="nav-sep"></div>
+    <div class="nav-sec">Extras</div>${item('leave')}`;
+  if(isMgmt() && !RO()){
+    h += `<div class="nav-sep"></div><div class="nav-sec">Manage</div>${item('m:overview')}${item('m:bookings')}${item('m:requests')}${item('m:hours')}`;
+    if(S.user.role==='Manager') h += item('m:people') + item('m:settings');
+  }
+  $('nav').innerHTML = h;
+  $('nav').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ go(b.dataset.p); closeSide(); });
+}
+let lrPoll=null;
+function go(page){ S.page = page; clearInterval(lrPoll); renderNav(); load(); window.scrollTo(0,0); }
+function enterApp(){
+  show('appView');
+  $('meName').textContent = S.user.name; $('meAv').textContent = ini(S.user.name);
+  $('popName').textContent = S.user.name; $('popRole').textContent = S.user.role + ' · ' + S.user.area;
+  startTicker(); go('dash');
+}
+async function load(){
+  $('main').innerHTML='<div class="loader"></div>';
+  try{
+    if(S.page.indexOf('m:')===0){ S.mtab = S.page.slice(2); S.mgmt = await call('getManagement'); S.links = S.mgmt.settings.links || S.links; renderNav(); renderMgmt(); }
+    else if(S.page==='requests'){ S.lr = await call('getListenerRequests'); pRequests();
+      lrPoll = setInterval(async()=>{ if(S.page!=='requests'||document.querySelector('#lrForm textarea:focus,#npForm input:focus')) return;
+        try{ S.lr = await api('getListenerRequests', S.token); pRequests(); }catch(_){} }, 30000); }
+    else { S.dash = await call('getDashboard'); renderDash(); }
+  }catch(e){ if(S.token) $('main').innerHTML='<div class="loading">Could not load. Refresh to try again.</div>'; }
+}
+
+let ticker=null, livePoll=null, LIVE_DATA=null, clockOffset=0;
+const pad = n => String(n).padStart(2,'0');
+const dur = ms => { ms=Math.max(0,ms); const h=Math.floor(ms/36e5), m=Math.floor(ms%36e5/6e4), sec=Math.floor(ms%6e4/1e3); return (h?h+':'+pad(m):m)+':'+pad(sec); };
+const sast = () => new Date(Date.now()+clockOffset).toLocaleTimeString('en-GB',{timeZone:TZ,hour12:false}) + ' SAST';
+function tick(){
+  const now=Date.now()+clockOffset; let ended=false;
+  document.querySelectorAll('[data-clock]').forEach(e=>e.textContent=sast());
+  document.querySelectorAll('[data-clocknum]').forEach(e=>e.textContent=new Date(now).toLocaleTimeString('en-GB',{timeZone:TZ,hour12:false}));
+  document.querySelectorAll('[data-since]').forEach(e=>e.textContent=dur(now-+e.dataset.since));
+  document.querySelectorAll('[data-left]').forEach(e=>{ const r=+e.dataset.left-now; if(r<=0) ended=true; e.textContent=dur(r); });
+  document.querySelectorAll('[data-until]').forEach(e=>{ const r=+e.dataset.until-now; if(r<=0) ended=true; e.textContent=dur(r); });
+  document.querySelectorAll('[data-prog]').forEach(e=>{ const [a,b]=e.dataset.prog.split('|').map(Number); e.style.width=Math.min(100,(now-a)/(b-a)*100)+'%'; });
+  if(ended && !tick.busy){ tick.busy=true; refreshLive().finally(()=>tick.busy=false); }
+}
+function startTicker(){ clearInterval(ticker); tick(); ticker=setInterval(tick,1000); }
+function startLive(L){
+  LIVE_DATA=L; if(L && L.serverNow) clockOffset = L.serverNow - Date.now();
+  $('tbLive').classList.toggle('hidden', !(L && L.onAir && L.onAir.length));
+  clearInterval(livePoll); livePoll = setInterval(refreshLive, 60000); tick();
+}
+async function refreshLive(){
+  if(!S.token) return;
+  try{ const P = await api('getPulse', S.token); const L=P.live; const c=$('liveCard'); if(c) c.outerHTML = liveHTML(L); startLive(L); setUnread(P.unread); }catch(_){}
+}
+const avatar = (o, cls) => o && o.image ? `<img class="${cls==='sv'?'sv-img':''}" src="${o.image}" alt="">` : `<div class="${cls==='sv'?'sv-ph':'ph'}">${esc(ini(o?o.show:''))}</div>`;
+const whenTxt = o => `${o.date===S.today?'Today':fmtDS(o.date)} | ${o.start} - ${o.end}`;
+function liveHTML(L){
+  if(!L) return '';
+  const now = Date.now()+clockOffset;
+  const nextRow = n => n ? `<div class="upnext">${avatar(n)}<div>Up next: <b>${esc(n.show)}</b> · ${esc(n.name)}${n.with?' with '+esc(n.with):''} · ${n.date===S.today?'today':dayName(n.date)} ${n.start}–${n.end}</div></div>` : '';
+  const sastBox = `<div class="tbox now"><div class="tval" data-clocknum>${new Date(now).toLocaleTimeString('en-GB',{timeZone:TZ,hour12:false})}</div><div class="tlbl">Time now · SAST</div></div>`;
+  if(!L.onAir.length){
+    const n = L.next;
+    return `<div class="card flush" id="liveCard"><div class="card-h"><span class="offair">OFF AIR</span><span class="clock-sm" data-clock>${sast()}</span></div>
+      <div class="card-b"><div class="offmsg">No one is live right now</div>
+      ${n ? `<div class="lbl-sm">Up next</div><div class="sv">${avatar(n,'sv')}
+        <div class="sv-info"><div class="sv-name">${esc(n.name)}</div><div class="sv-show">${esc(n.show)}</div>
+          <div class="sv-time">${whenTxt(n)}</div>${n.with?`<div class="sv-with">with ${esc(n.with)}</div>`:''}</div>
+        <div class="sv-timers"><div class="tbox"><div class="tval" data-until="${n.startMs}">${dur(n.startMs-now)}</div><div class="tlbl">Until next show</div></div>${sastBox}</div></div>`
+      : `<div class="sv"><div class="sv-info"><div class="sv-name">Nothing booked yet</div><div class="sv-with">Book a slot to get on air.</div></div><div class="sv-timers">${sastBox}</div></div>`}
+      </div></div>`;
+  }
+  return `<div class="card flush" id="liveCard"><div class="card-h"><span class="onair"><i></i>ON AIR</span><span class="clock-sm" data-clock>${sast()}</span></div>
+    <div class="card-b">${L.onAir.map(o=>`<div class="sv" style="margin-bottom:10px">${avatar(o,'sv')}
+      <div class="sv-info"><div class="sv-name">${esc(o.name)}</div><div class="sv-show">${esc(o.show)}</div>
+        <div class="sv-time">${whenTxt(o)}</div>${o.with?`<div class="sv-with">with ${esc(o.with)}</div>`:''}
+        <div class="prog"><i data-prog="${o.startMs}|${o.endMs}" style="width:${Math.min(100,(now-o.startMs)/(o.endMs-o.startMs)*100)}%"></i></div></div>
+      <div class="sv-timers"><div class="tbox"><div class="tval" data-since="${o.startMs}">${dur(now-o.startMs)}</div><div class="tlbl">Live for</div></div>
+        <div class="tbox"><div class="tval" data-left="${o.endMs}">${dur(o.endMs-now)}</div><div class="tlbl">Remaining</div></div>${sastBox}</div></div>`).join('')}
+      ${nextRow(L.next)}</div></div>`;
+}
+
+let cohosts = [], pickedImage = '';
+function renderDash(){
+  const d=S.dash; S.today=d.today; Object.assign(S.user, d.user); S.links=d.links; setUnread(d.unread);
+  ({dash:pDash, timetable:pTimetable, book:pBook, shows:pShows, leave:pLeave})[S.page]();
+  startLive(d.live);
+}
+function suspBanner(){
+  if(!RO()) return '';
+  return `<div class="banner bad"><b style="font-size:18px">⏸</b><div><b>Your account is suspended${S.user.suspendedUntil?' until '+fmtD(S.user.suspendedUntil):''}.</b>
+    You can view your dashboard, but you can’t book shows, send requests or make changes. Shows booked in that time were unbooked.</div></div>`;
+}
+function warnCard(d, full){
+  const n=d.warnings.length, max=d.maxWarnings, left=Math.max(0,max-n);
+  if(!n && !full) return '';
+  const msg = !n ? 'No warnings on your record. Keep it up!' : (left ? `${left} more warning${left>1?'s':''} and you’ll be removed from the team.` : 'You have reached the warning limit. A Manager will decide on your place in the team.');
+  return `<div class="card"><h3>Warnings <span class="badge ${!n?'b-ok':(left?'b-warn':'b-bad')}">${n} of ${max}</span></h3>
+    <div class="warnmeter ${left?'':'full'}">${[...Array(max)].map((_,i)=>`<i class="${i<n?'on':''}"></i>`).join('')}</div>
+    <div class="${left?'':'warnc'}" style="margin:8px 0 ${n?'12px':'0'}">${msg}</div>
+    ${d.warnings.map(w=>`<div class="hr-item Warning"><b>${fmtD(w.date)}</b> <span class="hint">by ${esc(w.by)}</span><div>${esc(w.details)}</div></div>`).join('')}</div>`;
+}
+function hoursCard(st){
+  const w=st.thisWeek, weeks=Math.max(1, st.pastWeeks+1);
+  return `<div class="card"><div class="kv">
+    <div>Hours this Week: <b>${fmtH(w.worked)}</b> <span class="hint" style="margin:0">/ ${fmtH(w.target)} h target</span></div>
+    <div>Booked still to air: <b>${fmtH(w.booked||0)}</b></div>
+    <div>Average Hours: <b>${fmtH(st.termWorked/weeks)}</b> <span class="hint" style="margin:0">a week</span></div>
+    <div>Hours this Term: <b>${fmtH(st.termWorked)}</b></div>
+    <div>Missed from past weeks: <b class="${st.pastShort?'warnc':''}">${fmtH(st.pastShort)}</b></div></div></div>`;
+}
+function pDash(){
+  const d=S.dash, st=d.stats, w=st.thisWeek;
+  const pct = w.target ? Math.min(100, w.worked/w.target*100) : 100;
+  const bpct = w.target ? Math.min(100-pct, (w.booked||0)/w.target*100) : 0;
+  const maxH = Math.max(1, ...st.recentWeeks.map(x=>Math.max(x.worked+(x.booked||0),x.target)));
+  $('main').innerHTML = `
+  <div class="page-h"><div><h1>Welcome back, ${esc(d.user.name.split(' ')[0])}</h1>
+    <p>${esc(d.user.area)} · week of ${fmtD(w.week)} · minimum ${fmtH(st.target)} h a week</p></div></div>
+  ${suspBanner()}${liveHTML(d.live)}
+  ${d.warnings.length?`<div style="margin-top:18px">${warnCard(d)}</div>`:''}
+  <div class="grid g4" style="margin-top:18px">
+    <div class="card stat hero"><div class="k">Hours done this week</div>
+      <div class="v">${fmtH(w.worked)} <small>/ ${fmtH(w.target)} h</small></div>
+      <div class="bar"><i style="width:${pct}%"></i><i style="width:${bpct}%;background:#e25bc855"></i></div>
+      <div class="s">${w.booked?`+ ${fmtH(w.booked)} h booked still to air`:(w.leaveDays?`Target lowered for ${w.leaveDays} approved day${w.leaveDays>1?'s':''} off`:'Hours count once a show has aired')}</div></div>
+    <div class="card stat"><div class="k">Outstanding this week</div>
+      <div class="v ${w.short?'warnc':'good'}">${fmtH(w.short)} <small>h</small></div>
+      <div class="s">${!w.short? 'Weekly minimum met ✓' : (w.unbooked? `Book ${fmtH(w.unbooked)} h more to cover it` : 'Covered by your bookings ✓')}</div></div>
+    <div class="card stat"><div class="k">Hours done this term</div>
+      <div class="v">${fmtH(st.termWorked)} <small>h</small></div>
+      <div class="s">since ${fmtD(st.termStart)} · expected ${fmtH(st.termExpected)} h</div></div>
+    <div class="card stat"><div class="k">Missed from past weeks</div>
+      <div class="v ${st.pastShort?'warnc':'good'}">${fmtH(st.pastShort)} <small>h</small></div>
+      <div class="s">${st.pastWeeks? `${st.weeksMet} of ${st.pastWeeks} weeks met`:'First week of term'}</div></div>
+  </div>
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card"><h3>My Upcoming Shows ${RO()?'':'<button class="btn sm" id="goBook">Book a Slot</button>'}</h3>${upcomingList(d.upcoming.slice(0,5))}</div>
+    <div class="card"><h3>Last ${st.recentWeeks.length} Weeks</h3>
+      <div class="weeks">${st.recentWeeks.map((x,i)=>{ const cur=i===st.recentWeeks.length-1;
+        return `<div class="wk"><b>${fmtH(x.worked)}</b><div class="track">${cur&&x.booked?`<div class="col pend" style="height:${(x.worked+x.booked)/maxH*100}%"></div>`:''}
+          <div class="col ${cur?'cur':(x.short?'short':'')}" style="height:${x.worked/maxH*100}%"></div><div class="tgt" style="bottom:${x.target/maxH*100}%"></div></div>
+          <span>${fmtD(x.week)}</span></div>`;}).join('')}</div>
+      <div class="hint">Dashed line = target. Orange = week below target. Faded pink = booked, not yet aired.</div></div>
+  </div>`;
+  if($('goBook')) $('goBook').onclick = () => go('book');
+  wireUpcoming();
+}
+function upcomingList(list){
+  return list.length ? list.map(o=>`<div class="slot">
+    <div class="when"><b>${dayName(o.date)}</b><span>${fmtT(o.start,o.end)}</span></div>
+    <div class="what"><b class="pinktxt">${esc(o.show)}</b> ${o.permanent?'<span class="badge b-info">Permanent</span>':''}
+      <div class="hint" style="margin:2px 0 0">${o.isOwner?(o.with?'with '+esc(o.with):'Solo'):'Booked by '+esc(o.name)+(o.with?' · with '+esc(o.with):'')} · ${fmtH(o.hours)} h</div>
+      ${o.isOwner&&!RO()?`<div class="act" style="margin-top:8px">
+        <button class="btn ghost sm" data-av="${o.id}">${o.hasImage?'Change avatar':'Add avatar'}</button>
+        <button class="btn ghost sm" data-cx="${o.id}|${o.date}|one">${o.permanent?'Skip this week':'Cancel'}</button>
+        ${o.permanent?`<button class="btn ghost sm" data-cx="${o.id}|${o.date}|series">End show from here</button>`:''}</div>`:''}
+    </div></div>`).join('') : '<div class="empty">No shows booked yet.</div>';
+}
+function wireUpcoming(){
+  document.querySelectorAll('[data-cx]').forEach(b=>b.onclick=async()=>{ const [id,date,scope]=b.dataset.cx.split('|');
+    if(!confirm(scope==='series'?'End this permanent show from '+fmtD(date)+' onwards?':'Cancel the show on '+fmtD(date)+'?'))return; busy(b,true);
+    try{ S.dash = await call('cancelBooking', id, date, scope); toast('Booking updated'); renderDash(); }catch(_){busy(b,false);} });
+  document.querySelectorAll('[data-av]').forEach(b=>b.onclick=async()=>{ let img; try{ img = await pickImage(); }catch(_){ return; }
+    busy(b,true); try{ S.dash = await call('setBookingImage', b.dataset.av, img); toast('Show avatar updated'); renderDash(); }catch(_){busy(b,false);} });
+}
+
+function pTimetable(){
+  const d=S.dash, mon = (()=>{ const t=new Date(d.today+'T12:00:00'); t.setDate(t.getDate()-((t.getDay()+6)%7)); return t; })();
+  const nWeeks = Math.max(1, Math.ceil((d.bookingWindow+1)/7));
+  const weeks = [...Array(nWeeks)].map((_,i)=>{ const x=new Date(mon); x.setDate(x.getDate()+7*i); return x.toISOString().slice(0,10); });
+  if(S.tt>=weeks.length) S.tt=0;
+  const ws = weeks[S.tt], days=[...Array(7)].map((_,i)=>{ const x=new Date(ws+'T12:00:00'); x.setDate(x.getDate()+i); return x.toISOString().slice(0,10); });
+  const dmy = s => s.split('-').reverse().join('-');
+  $('main').innerHTML = `${liveHTML(d.live)}
+  <div class="card" style="margin-top:18px"><h3>Timetable <span class="clock-sm" data-clock>${sast()}</span></h3>
+    <div class="tabs">${weeks.map((w,i)=>`<button data-w="${i}" class="${S.tt===i?'on':''}">${dmy(w)}</button>`).join('')}</div>
+    ${days.map(day=>{ const l=d.studio.filter(o=>o.date===day);
+      return `<div class="day-h">${dayName(day)}${day===d.today?' · today':''}</div>` + (l.length? l.map(o=>`<div class="slot">
+        <div class="when"><b>${fmtT(o.start,o.end)}</b></div>
+        <div class="what"><b class="pinktxt">${esc(o.show)}</b> ${o.permanent?'<span class="badge b-info">Permanent</span>':''}
+          <div class="hint" style="margin:2px 0 0">${esc(o.name)}${o.with?' with '+esc(o.with):''}</div></div></div>`).join('')
+        : `<div class="hint" style="margin:6px 0 10px">${day<d.today?'—':'Studio free'}</div>`); }).join('')}
+  </div>`;
+  document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{ S.tt=+b.dataset.w; renderDash(); });
+}
+
+function pBook(){
+  const d=S.dash; cohosts=[]; pickedImage='';
+  if(RO()){ $('main').innerHTML = suspBanner() + `<div class="card"><h3>My Upcoming Shows</h3>${upcomingList(d.upcoming)}</div>`; return; }
+  $('main').innerHTML = `
+  <div class="grid g2">
+  <div class="card"><h3>Book a Slot</h3>
+    <form id="bForm">
+      <label class="rq">Show name</label><input id="bShow" maxlength="120" required placeholder="e.g. KovsieX Breakfast Show">
+      <label class="rq">Day</label><input type="date" id="bDate" value="${d.today}" min="${d.today}" max="${d.maxDate}" required>
+      <div id="dayBusy" class="hint" style="margin-top:8px"></div>
+      <label class="rq">Time</label>
+      <div class="frow"><div><input type="time" id="bStart" step="900" required aria-label="Start time"></div><div><input type="time" id="bEnd" step="900" required aria-label="End time"></div></div>
+      <label>Permanent Slot</label>
+      <div class="switch-row"><label class="switch" style="margin:0"><input type="checkbox" id="bPerm"><span></span></label><span class="hint" style="margin:0">Repeats every week on this day and time</span></div>
+      <label>Doing the show with</label>
+      <select id="bWithSel"><option value="">Add a KovsieX co-host…</option>${d.staffList.map(x=>`<option value="${esc(x.email)}">${esc(x.name)}</option>`).join('')}</select>
+      <div id="chips" class="chips"></div>
+      <input id="bOther" maxlength="150" placeholder="Guests or other people (optional)" style="margin-top:8px">
+      <div class="extra"><div class="extra-h"><span>Extra Details</span><button type="button" class="linkbtn" id="exTog">Hide</button></div>
+        <div class="extra-b" id="exBody"><label>Show Avatar</label>
+          <div class="av-pick"><img class="av-thumb hidden" id="avPrev" alt=""><button type="button" class="btn light sm" id="avBtn">Select Avatar</button>
+            <button type="button" class="linkbtn hidden" id="avClear">Remove</button></div>
+          <div class="hint">Shown on the On Air panel while your show is live and when it's up next. Square images work best.</div></div></div>
+      <div class="hint" id="bInfo">You can book up to ${d.bookingWindow} days ahead. Hours count once the show has aired.</div>
+      <button class="btn" style="margin-top:14px" id="bBtn">Book</button>
+    </form></div>
+  <div class="card"><h3>My Upcoming Shows</h3>${upcomingList(d.upcoming)}</div>
+  </div>`;
+  const drawChips = () => { $('chips').innerHTML = cohosts.map(e=>{const x=d.staffList.find(v=>v.email===e);
+    return `<span class="chip">${esc(x?x.name:e)}<button type="button" data-rmc="${esc(e)}" aria-label="Remove">×</button></span>`;}).join('');
+    $('chips').querySelectorAll('[data-rmc]').forEach(b=>b.onclick=()=>{cohosts=cohosts.filter(e=>e!==b.dataset.rmc); drawChips();}); };
+  $('bWithSel').onchange = e => { const v=e.target.value; if(v && !cohosts.includes(v)) cohosts.push(v); e.target.value=''; drawChips(); };
+  const showBusy = () => { const day=$('bDate').value; const l=d.studio.filter(o=>o.date===day);
+    $('dayBusy').innerHTML = l.length ? 'Already booked that day: ' + l.map(o=>`<span class="badge b-mute">${o.start}–${o.end} ${esc(o.show)}</span>`).join(' ') : (day?'Studio is free all day.':''); };
+  const showInfo = () => { const a=$('bStart').value, b=$('bEnd').value; if(!a||!b) return;
+    const m=t=>{const p=t.split(':');return +p[0]*60+ +p[1];}; const h=(m(b)-m(a))/60;
+    $('bInfo').textContent = h>0 ? `${fmtH(h)} h${$('bPerm').checked?' every week':''} · hours count once the show has aired.` : 'End time must be after start time.'; };
+  $('bDate').onchange = showBusy; ['bStart','bEnd','bPerm'].forEach(id=>$(id).onchange=showInfo); showBusy();
+  $('exTog').onclick = () => { const h=$('exBody').classList.toggle('hidden'); $('exTog').textContent = h?'Show':'Hide'; };
+  $('avBtn').onclick = async () => { try{ pickedImage = await pickImage(); $('avPrev').src=pickedImage; $('avPrev').classList.remove('hidden');
+    $('avClear').classList.remove('hidden'); $('avBtn').textContent='Change Avatar'; }catch(_){} };
+  $('avClear').onclick = () => { pickedImage=''; $('avPrev').classList.add('hidden'); $('avClear').classList.add('hidden'); $('avBtn').textContent='Select Avatar'; };
+  $('bForm').onsubmit = async e => { e.preventDefault(); const b=$('bBtn'); busy(b,true);
+    try{ S.dash = await call('bookSlot',{date:$('bDate').value,start:$('bStart').value,end:$('bEnd').value,show:$('bShow').value,
+      withEmails:cohosts,withOther:$('bOther').value,permanent:$('bPerm').checked,image:pickedImage}); toast('Slot booked'); renderDash(); }catch(_){busy(b,false);} };
+  wireUpcoming();
+}
+
+function pShows(){
+  const d=S.dash, st=d.stats;
+  const perm = d.upcoming.filter(o=>o.permanent && o.isOwner).filter((o,i,a)=>a.findIndex(x=>x.id===o.id)===i);
+  const dow = s => new Date(s+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'long'});
+  $('main').innerHTML = `
+  <div class="grid g2e">
+    <div class="card"><div class="profile"><div class="big">${esc(ini(d.user.name))}</div>
+      <div><div style="font-size:18px;font-weight:600">${esc(d.user.name)}</div><div class="hint" style="margin:2px 0">Joined: ${fmtDS(d.user.startDate)}</div>
+      <div class="hint" style="margin:0">${esc(d.user.role)} · ${esc(d.user.area)}</div></div></div></div>
+    ${hoursCard(st)}
+  </div>
+  ${suspBanner()?'<div style="margin-top:18px">'+suspBanner()+'</div>':''}
+  <div class="grid g2e" style="margin-top:18px">${warnCard(d, true)}
+    <div class="card"><h3>Show Reviews</h3><div class="tbl">${d.reviews.length?`<table><tr><th>Show</th><th>Date</th><th>Score</th><th>Options</th></tr>
+      ${d.reviews.map((r,i)=>`<tr><td class="pinktxt">${esc(r.show)}</td><td>${fmtDS(r.date)}</td><td>${fmtH((r.music+r.mic+r.engagement+r.imaging)/4)} / 5</td>
+        <td><button class="btn sm" data-rv="${i}">View</button></td></tr>`).join('')}</table>`:'<div class="empty">No reviews yet</div>'}</div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>Upcoming Shows</h3>${upcomingList(d.upcoming)}</div>
+  <div class="card" style="margin-top:18px"><h3>Latest Shows</h3><div class="tbl">
+    ${d.recent.length||d.extraHours.length?`<table><tr><th>Description</th><th>Date</th><th>Start</th><th>End</th><th>Hours</th></tr>
+    ${d.recent.map(o=>`<tr><td><span class="linkicon">🔗</span>${esc(o.show)}${o.with?`<div class="hint" style="margin:0">with ${esc(o.with)}</div>`:''}</td><td>${fmtDS(o.date)}</td><td>${o.start}</td><td>${o.end}</td>
+      <td>${o.noShow?'<span class="badge b-bad">No-show</span>':fmtH(o.hours)}</td></tr>`).join('')}
+    ${d.extraHours.map(h=>`<tr><td>${esc(h.activity)} <span class="badge b-mute">added by Manager</span></td><td>${fmtDS(h.date)}</td><td>—</td><td>—</td><td>${fmtH(h.hours)}</td></tr>`).join('')}
+    </table>`:'<div class="empty">No Data</div>'}</div></div>
+  <div class="card" style="margin-top:18px"><h3>Perm Slots</h3><div class="tbl">
+    ${perm.length?`<table><tr><th>Description</th><th>Day</th><th>Start</th><th>End</th><th>Options</th></tr>
+    ${perm.map(o=>`<tr><td>${esc(o.show)}</td><td>${dow(o.date)}</td><td>${o.start}</td><td>${o.end}</td>
+      <td>${RO()?'':`<button class="btn ghost sm" data-cx="${o.id}|${o.date}|series">End show</button>`}</td></tr>`).join('')}</table>`:'<div class="empty">No Data</div>'}</div></div>`;
+  wireUpcoming();
+  document.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>reviewModal(d.reviews[+b.dataset.rv]));
+}
+
+function pLeave(){
+  const d=S.dash;
+  $('main').innerHTML = `
+  ${suspBanner()}<div class="grid g2">
+    ${RO()?'':`<div class="card"><h3>Request Leave or Send an Excuse</h3>
+      <form id="rForm">
+        <label class="rq">Type</label><select id="rType"><option value="Leave">Leave (planned time away)</option><option value="Excuse">Excuse (missed time)</option></select>
+        <div class="frow"><div><label class="rq">Start Date</label><input type="date" id="rStart" value="${d.today}" required></div>
+          <div><label class="rq">End Date</label><input type="date" id="rEnd" value="${d.today}" required></div></div>
+        <label class="rq">Reason</label><textarea id="rReason" maxlength="500" required placeholder="Short explanation for your Supervisor and Manager"></textarea>
+        <div class="hint">Goes to your Supervisor first, then a Manager. Approved leave lowers that week's hours target.</div>
+        <button class="btn" style="margin-top:14px" id="rBtn">Submit</button>
+      </form></div>`}
+    <div class="card"><h3>Vacations</h3><div class="tbl">
+      ${d.requests.length?`<table><tr><th>Reason</th><th>Start Date</th><th>End Date</th><th>Options</th></tr>
+      ${d.requests.map(r=>`<tr><td><b>${esc(r.type)}</b> · ${esc(r.reason)}${r.comment?`<div class="hint" style="margin:2px 0 0">Comment: ${esc(r.comment)}</div>`:''}</td>
+        <td>${fmtDS(r.start)}</td><td>${fmtDS(r.end||r.start)}</td>
+        <td>${statusBadge(r.status==='Approved'&&(r.end||r.start)<d.today?'Ended':r.status)}
+          ${r.status.indexOf('Pending')===0&&!RO()?`<div style="margin-top:6px"><button class="btn ghost sm" data-cancel="${r.id}">Cancel</button></div>`:''}</td></tr>`).join('')}</table>`
+      :'<div class="empty">No Data</div>'}</div></div>
+  </div>`;
+  if($('rForm')) $('rForm').onsubmit = async e => { e.preventDefault(); const b=$('rBtn'); busy(b,true);
+    try{ S.dash = await call('submitRequest',{type:$('rType').value,start:$('rStart').value,end:$('rEnd').value,reason:$('rReason').value}); toast('Request submitted'); renderDash(); }catch(_){busy(b,false);} };
+  document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=async()=>{ busy(b,true);
+    try{ S.dash = await call('cancelRequest', b.dataset.cancel); toast('Request cancelled'); renderDash(); }catch(_){busy(b,false);} });
+}
+
+const RQ = [['music','Quality of the Music'],['mic','Quality of Presenter’s Microphone'],['engagement','Level of engagement with Listeners'],['imaging','How effectively was Imaging used?']];
+function reviewModal(r, writeFor){
+  const ro = !writeFor;
+  const head = ro ? `${esc(r.show)} · ${fmtDS(r.date)}` : `${esc(writeFor.show)} · ${fmtDS(writeFor.date)} ${writeFor.start}–${writeFor.end}`;
+  $('modalRoot').innerHTML = `<div class="modal"><div class="card wide"><h3>Show Review <button class="btn ghost sm" id="rvClose">Close</button></h3>
+    <div class="info" style="margin-bottom:6px"><b>i</b><div>Reviews are a friendly way to get constructive feedback on shows. They reflect one person’s opinion. If any feedback feels unfair, please speak to a Supervisor or Manager.</div></div>
+    <div class="hint" style="margin:0 0 6px">${head}${ro?' · reviewed by '+esc(r.by):(writeFor.name?' · '+esc(writeFor.name):'')}</div>
+    ${RQ.map(([k,l])=>`<div class="rv-row"><label>${l}</label><input type="range" min="0" max="5" step="1" id="rv_${k}" value="${ro?r[k]:3}" ${ro?'disabled':''}>
+      <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div>`).join('')}
+    <label>Additional Comments</label>
+    ${ro ? `<div style="white-space:pre-wrap;padding:10px 14px;border:1px solid var(--line);border-radius:4px;background:#18303e">${esc(r.comments||'—')}</div>`
+         : '<textarea id="rv_comments" maxlength="3000" placeholder="What went well, and what could be better?"></textarea>'}
+    ${ro?'':'<button class="btn" style="margin-top:14px" id="rvSave">Submit review</button>'}
+  </div></div>`;
+  $('rvClose').onclick = () => $('modalRoot').innerHTML='';
+  if(!ro) $('rvSave').onclick = async () => { const b=$('rvSave'); busy(b,true);
+    try{ S.mgmt = await call('reviewShow',{id:writeFor.id,date:writeFor.date,music:$('rv_music').value,mic:$('rv_mic').value,
+      engagement:$('rv_engagement').value,imaging:$('rv_imaging').value,comments:$('rv_comments').value});
+      $('modalRoot').innerHTML=''; toast('Review sent to the host'); renderMgmt(); }catch(_){busy(b,false);} };
+}
+
+function pRequests(){
+  const R=S.lr, ro=R.readOnly||RO();
+  S.lrTab = S.lrTab || 'Request';
+  const tabs = R.types.concat(['Pinned','Deleted']);
+  const inTab = (r,t) => t==='Deleted' ? r.status==='Deleted' : t==='Pinned' ? (r.pinned && r.status!=='Deleted') : (r.type===t && r.status!=='Deleted');
+  const count = t => R.list.filter(r=>inTab(r,t) && (t==='Deleted'||t==='Pinned' ? true : r.status==='New')).length;
+  const list = R.list.filter(r=>inTab(r,S.lrTab)).sort((a,b)=>(b.pinned-a.pinned)||(a.status==='Done')-(b.status==='Done')||String(b.created).localeCompare(String(a.created)));
+  const np = R.nowPlaying;
+  const pic = (u, cls) => u ? `<img src="${esc(u)}" alt="">` : `<div class="ph">♪</div>`;
+  $('main').innerHTML = `${ro?suspBanner():''}
+  <div class="grid g2">
+    <div class="card"><h3>Now Playing <span class="clock-sm" data-clock>${sast()}</span></h3>
+      <div class="np">${pic(np&&np.art)}<div><b>${np?esc(np.title):'Nothing set yet'}</b><span class="hint" style="margin:0">${np?esc(np.artist)+' · '+np.at:'Set the song that’s playing so listeners see it on the website.'}</span></div></div>
+      ${R.autoNowPlaying?'<div class="hint">Updates automatically from RadioDJ via Iono.fm. Type below only to correct it.</div>':''}
+      ${ro?'':`<form id="npForm" class="frow" style="margin-top:14px"><div><input id="npT" placeholder="Song title" maxlength="120" required></div>
+        <div><input id="npA" placeholder="Artist" maxlength="120"></div><div style="flex:0 0 auto"><button class="btn" id="npB">Set</button></div></form>`}
+      ${R.recent.length>1?`<div class="lbl-sm" style="margin-top:16px">Recently played</div>${R.recent.slice(1,6).map(p=>`<div class="played">${pic(p.art)}<div class="t"><b>${esc(p.title)}</b><span>${esc(p.artist)}</span></div><div class="tm">${esc(p.at)}</div></div>`).join('')}`:''}
+    </div>
+    <div class="card"><h3>Send a Request <span class="vbadge">✔ VERIFIED</span></h3>
+      ${ro?'<div class="hint" style="margin:0">Not available while suspended.</div>':`<form id="lrForm">
+        <div class="frow"><div><label style="margin-top:0">Type</label><select id="lrT">${R.types.map(t=>`<option>${t}</option>`).join('')}</select></div></div>
+        <label>Message</label><textarea id="lrM" maxlength="300" required placeholder="Your request or shoutout"></textarea>
+        <div class="hint">Messages you send from here show your name in <b style="color:#ff6b70">red</b> with a Verified tag, so presenters know it’s from the team.</div>
+        <button class="btn" style="margin-top:12px" id="lrB">Send</button></form>`}
+      <div class="lbl-sm" style="margin-top:18px">Public listener website</div>
+      <div class="copyrow"><input id="pubUrl" readonly value="${esc(LIVE ? PUBLIC_URL : R.publicUrl)}"><button class="btn ghost sm" type="button" id="pubCopy">Copy</button></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>Listener Requests <span class="hint" style="margin:0;font-weight:400">updates every 30 seconds</span></h3>
+    <div class="tabs">${tabs.map(t=>{const c=count(t);return `<button data-lt="${t}" class="${S.lrTab===t?'on':''}">${t}${c?`<span class="count" style="${t==='Deleted'?'background:#6f8796':''}">${c}</span>`:''}</button>`;}).join('')}</div>
+    ${list.length? list.map(r=>`<div class="lr ${r.verified?'verified':''} ${r.status==='Done'?'done':''}"><div class="bar2"></div>
+      <div class="lr-b"><div class="lr-name">${esc(r.name)}${r.verified?'<span class="vbadge">✔ VERIFIED</span>':''} ${r.pinned?'<span class="badge b-info">Pinned</span>':''} ${r.status==='Done'?'<span class="badge b-ok">Done</span>':''}</div>
+        <div class="lr-msg">${esc(r.message)}</div>
+        <div class="lr-meta">${esc(String(r.created).slice(11,16))} - Sent in via ${r.source==='Website'?'KovsieX website':'Staff portal'}${S.lrTab==='Pinned'||S.lrTab==='Deleted'?' · '+esc(r.type):''}</div></div>
+      ${ro?'':`<div class="lr-act">${r.status==='Deleted'
+        ? `<button class="sq grey" data-la="${r.id}|restore" title="Restore">↺</button>`
+        : `<button class="sq blue" data-la="${r.id}|${r.pinned?'unpin':'pin'}" title="${r.pinned?'Unpin':'Pin'}">${r.pinned?'✕':'📌'}</button>
+           <button class="sq green" data-la="${r.id}|${r.status==='Done'?'new':'done'}" title="${r.status==='Done'?'Mark as new':'Mark as done'}">${r.status==='Done'?'↺':'✓'}</button>
+           <button class="sq red" data-la="${r.id}|delete" title="Delete">🗑</button>`}</div>`}
+    </div>`).join('') : '<div class="empty">No messages here.</div>'}
+  </div>`;
+  document.querySelectorAll('[data-lt]').forEach(b=>b.onclick=()=>{ S.lrTab=b.dataset.lt; pRequests(); });
+  document.querySelectorAll('[data-la]').forEach(b=>b.onclick=async()=>{ const [id,a]=b.dataset.la.split('|'); b.disabled=true;
+    try{ S.lr = await call('updateListenerRequest', id, a); pRequests(); }catch(_){ b.disabled=false; } });
+  $('pubCopy').onclick = () => { const i=$('pubUrl'); i.select(); try{ navigator.clipboard.writeText(i.value).then(()=>toast('Link copied')); }catch(_){ toast('Select the link and copy it'); } };
+  if($('npForm')) $('npForm').onsubmit = async e => { e.preventDefault(); const b=$('npB'); busy(b,true);
+    try{ S.lr = await call('setNowPlaying',{title:$('npT').value,artist:$('npA').value}); toast('Now playing updated'); pRequests(); }catch(_){busy(b,false);} };
+  if($('lrForm')) $('lrForm').onsubmit = async e => { e.preventDefault(); const b=$('lrB'); busy(b,true);
+    try{ S.lr = await call('staffSendRequest',{type:$('lrT').value,message:$('lrM').value}); S.lrTab=$('lrT').value; toast('Sent'); pRequests(); }catch(_){busy(b,false);} };
+}
+
+function renderMgmt(){
+  const m=S.mgmt;
+  const pending = m.requests.filter(r=>r.canAct).length;
+  const tabs=[['overview','Overview'],['bookings','Studio bookings'],['requests','Requests'],['hours','Extra hours']];
+  if(m.isManager) tabs.push(['people','People & HR'],['settings','Settings']);
+  const active = m.staff.filter(s=>s.active);
+  const under = active.filter(s=>s.week.short>0);
+  if(!tabs.some(t=>t[0]===S.mtab)) S.mtab='overview';
+  renderNav();
+  $('main').innerHTML = `
+  <div class="page-h"><div><h1>${esc(PAGES['m:'+S.mtab][0])}</h1><p>Management · Radio · week of ${fmtD(active[0]?active[0].week.week:m.today)} · signed in as ${esc(m.me.role)}</p></div></div>
+  <div id="mBody"></div>`;
+  S.today = m.today;
+  ({overview:mOverview,bookings:mBookings,requests:mRequests,hours:mHours,people:mPeople,settings:mSettings})[S.mtab]();
+
+  function mOverview(){
+    const list = active.filter(s=>(!S.f.area||s.area===S.f.area) && (!S.f.q || (s.name+' '+s.email).toLowerCase().includes(S.f.q.toLowerCase())));
+    const weekHrs = active.reduce((a,s)=>a+s.week.worked,0);
+    $('mBody').innerHTML = `${liveHTML(m.live)}
+    <div class="grid g4" style="margin-top:18px">
+      <div class="card stat hero"><div class="k">Active staff</div><div class="v">${active.length}</div><div class="s">${m.staff.length-active.length} inactive</div></div>
+      <div class="card stat"><div class="k">Aired this week</div><div class="v">${fmtH(weekHrs)} <small>h</small></div><div class="s">+ ${fmtH(active.reduce((a,s)=>a+(s.week.booked||0),0))} h still booked</div></div>
+      <div class="card stat"><div class="k">Not enough booked</div><div class="v ${under.filter(x=>x.week.unbooked).length?'warnc':'good'}">${under.filter(x=>x.week.unbooked).length}</div><div class="s">${under.length} still short this week</div></div>
+      <div class="card stat"><div class="k">Waiting on you</div><div class="v ${pending?'warnc':'good'}">${pending}</div><div class="s">leave / excuse requests</div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h3>All staff</h3>
+      <div class="filters"><input id="fQ" placeholder="Search name or email" value="${esc(S.f.q)}">
+        <select id="fA"><option value="">All areas</option>${m.areas.map(a=>`<option ${S.f.area===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
+      <div class="tbl"><table><tr><th>Name</th><th>Area</th><th>Role</th><th>Aired this week</th><th>Booked to come</th><th>Outstanding</th><th>Hours done (term)</th><th>Missed (past weeks)</th></tr>
+      ${list.map(s=>`<tr><td><b>${esc(s.name)}</b><div class="hint" style="margin:0">${esc(s.email)}</div></td><td>${esc(s.area)}</td><td>${esc(s.role)}</td>
+        <td>${fmtH(s.week.worked)} / ${fmtH(s.week.target)} h${s.week.leaveDays?` <span class="badge b-info">leave</span>`:''}</td>
+        <td>${s.week.booked?fmtH(s.week.booked)+' h':'<span class="hint">—</span>'}</td>
+        <td>${!s.week.short?'<span class="badge b-ok">Met</span>':(s.week.unbooked?`<span class="badge b-warn">${fmtH(s.week.short)} h · ${fmtH(s.week.unbooked)} unbooked</span>`:`<span class="badge b-info">${fmtH(s.week.short)} h · booked</span>`)}</td>
+        <td>${fmtH(s.termWorked)} h</td>
+        <td>${s.pastShort?`<span class="badge b-bad">${fmtH(s.pastShort)} h</span>`:'<span class="badge b-ok">0</span>'} <span class="hint">${s.weeksMet}/${s.pastWeeks} wks</span></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No staff match.</td></tr>'}
+      </table></div></div>`;
+    $('fQ').oninput=e=>{S.f.q=e.target.value; const p=e.target.selectionStart; mOverview(); $('fQ').focus(); $('fQ').setSelectionRange(p,p);};
+    $('fA').onchange=e=>{S.f.area=e.target.value; mOverview();};
+    startLive(m.live);
+  }
+
+  function mBookings(){
+    const days = {};
+    m.schedule.forEach(o=>{ (days[o.date]=days[o.date]||[]).push(o); });
+    const keys = Object.keys(days).sort();
+    const up = keys.filter(k=>k>=m.today), past = keys.filter(k=>k<m.today).reverse();
+    const row = o => `<div class="slot ${o.past?'past':''}">
+      <div class="when"><b>${fmtT(o.start,o.end)}</b><span>${fmtH(o.hours)} h</span></div>
+      <div class="what"><b>${esc(o.show)}</b> ${o.permanent?'<span class="badge b-info">Permanent</span>':''} ${o.noShow?'<span class="badge b-bad">No-show</span>':''}
+        <div class="hint" style="margin:2px 0 0">${esc(o.name)}${o.with?' · with '+esc(o.with):''}</div>
+        <div class="act" style="margin-top:6px">${o.past
+          ? `<button class="btn ghost sm" data-ns="${o.id}|${o.date}|${o.noShow?0:1}">${o.noShow?'Undo no-show':'Mark no-show'}</button>
+             ${o.noShow?'':`<button class="btn sm" data-rvw="${o.id}|${o.date}">${o.reviewed?'Review again':'Review show'}</button>`} ${o.reviewed?'<span class="badge b-ok">Reviewed</span>':''}`
+          : `<button class="btn ghost sm" data-mcx="${o.id}|${o.date}|one">${o.permanent?'Cancel this week':'Cancel'}</button>
+             ${o.permanent?`<button class="btn ghost sm" data-mcx="${o.id}|${o.date}|series">End show from here</button>`:''}`}</div>
+      </div></div>`;
+    const block = ks => ks.map(k=>`<div class="day-h">${dayName(k)}${k===m.today?' · today':''}</div>${days[k].map(row).join('')}`).join('');
+    $('mBody').innerHTML = `<div class="grid g2">
+      <div class="card"><h3>Coming up (next ${m.settings.bookingWindow} days)</h3>${block(up)||'<div class="empty">Nothing booked yet.</div>'}</div>
+      <div class="card"><h3>Last 2 weeks</h3><div class="hint" style="margin:-6px 0 8px">Mark a no-show if a show didn't happen — its hours are removed for everyone on it.</div>${block(past)||'<div class="empty">No shows in the last 2 weeks.</div>'}</div></div>`;
+    document.querySelectorAll('[data-rvw]').forEach(b=>b.onclick=()=>{ const [id,date]=b.dataset.rvw.split('|');
+      reviewModal(null, m.schedule.find(o=>o.id===id&&o.date===date)); });
+    document.querySelectorAll('[data-ns]').forEach(b=>b.onclick=async()=>{ const [id,date,on]=b.dataset.ns.split('|'); busy(b,true);
+      try{ S.mgmt = await call('setNoShow', id, date, on==='1'); toast(on==='1'?'Marked as no-show':'No-show removed'); renderMgmt(); }catch(_){busy(b,false);} });
+    document.querySelectorAll('[data-mcx]').forEach(b=>b.onclick=async()=>{ const [id,date,scope]=b.dataset.mcx.split('|');
+      if(!confirm(scope==='series'?'End this permanent show from '+fmtD(date)+' onwards?':'Cancel the show on '+fmtD(date)+'?'))return; busy(b,true);
+      try{ S.mgmt = await call('managerCancelBooking', id, date, scope); toast('Booking updated'); renderMgmt(); }catch(_){busy(b,false);} });
+  }
+
+  function mRequests(){
+    const mine = m.requests.filter(r=>r.canAct);
+    const rest = m.requests.filter(r=>!r.canAct);
+    const card = r => {
+      const s1 = r.status==='Pending Supervisor' ? 'now' : 'done';
+      const s2 = r.status==='Approved' ? 'done' : (r.status==='Pending Manager'?'now':'');
+      return `<div class="req"><div class="req-h"><div><b>${esc(r.name)}</b> · ${esc(r.type)} · ${fmtD(r.start)}${r.end&&r.end!==r.start?' – '+fmtD(r.end):''}</div>${statusBadge(r.status)}</div>
+        <p>${esc(r.reason)}</p>
+        <div class="steps"><span class="dot ${r.status==='Declined'&&!r.managerBy?'':s1}"></span>Supervisor${r.supervisorBy?' ('+esc(r.supervisorBy)+')':''}
+          <span style="margin:0 4px">→</span><span class="dot ${s2}"></span>Manager${r.managerBy?' ('+esc(r.managerBy)+')':''}</div>
+        ${r.comment?`<div class="meta" style="margin-top:6px">Comment: ${esc(r.comment)}</div>`:''}
+        <div class="meta">Submitted ${esc(r.created)}</div>
+        ${r.canAct?`<div class="act"><input placeholder="Optional comment" id="c_${r.id}">
+          <button class="btn ok sm" data-ap="${r.id}">${r.status==='Pending Supervisor'&&m.me.role==='Supervisor'?'Approve → Manager':'Approve'}</button>
+          <button class="btn bad sm" data-dc="${r.id}">Decline</button></div>`:''}</div>`;
+    };
+    $('mBody').innerHTML = `<div class="grid g2">
+      <div><h3 style="margin-bottom:10px">Waiting on you (${mine.length})</h3>${mine.map(card).join('')||'<div class="card empty">Nothing waiting — all caught up.</div>'}</div>
+      <div><h3 style="margin-bottom:10px">All other requests</h3>${rest.slice(0,60).map(card).join('')||'<div class="card empty">No requests yet.</div>'}</div></div>`;
+    const act = async (b, dec) => { busy(b,true);
+      try{ S.mgmt = await call('decideRequest', b.dataset.ap||b.dataset.dc, dec, ($('c_'+(b.dataset.ap||b.dataset.dc))||{}).value||''); toast(dec==='Approve'?'Approved':'Declined'); renderMgmt(); }catch(_){busy(b,false);} };
+    document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>act(b,'Approve'));
+    document.querySelectorAll('[data-dc]').forEach(b=>b.onclick=()=>act(b,'Decline'));
+  }
+
+  function mHours(){
+    const list = m.hours.filter(h=>!S.f.hq || (h.name+' '+h.activity+' '+h.area).toLowerCase().includes(S.f.hq.toLowerCase()));
+    $('mBody').innerHTML = `
+    ${m.isManager?`<div class="card" style="margin-bottom:14px"><h3>Add hours for a staff member</h3>
+      <form id="maForm" class="frow">
+        <div><label>Staff</label><select id="maE">${active.map(s=>`<option value="${esc(s.email)}">${esc(s.name)}</option>`).join('')}</select></div>
+        <div><label>Date</label><input type="date" id="maD" value="${m.today}"></div>
+        <div><label>Hours</label><input type="number" id="maH" min="0.25" step="0.25" value="1"></div>
+        <div class="wide"><label>Activity</label><input id="maA" placeholder="e.g. Outside broadcast at rugby"></div>
+        <button class="btn" id="maB">Add</button></form></div>`:''}
+    <div class="card"><h3>Hours added by hand</h3><div class="hint" style="margin:-6px 0 10px">Show hours come from Studio bookings automatically. Use this for anything else, like outside broadcasts.</div>
+      <div class="filters"><input id="hq" placeholder="Filter by name, area or activity" value="${esc(S.f.hq)}"></div>
+      <div class="tbl"><table><tr><th>Date</th><th>Name</th><th>Hours</th><th>Area</th><th>Activity</th><th></th></tr>
+      ${list.map(h=>`<tr><td>${fmtD(h.date)}</td><td>${esc(h.name)}</td><td><b>${fmtH(h.hours)}</b></td><td>${esc(h.area)}</td><td>${esc(h.activity)}</td>
+        <td><button class="btn ghost sm" data-rm="${h.id}">Remove</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No extra hours added.</td></tr>'}</table></div></div>`;
+    $('hq').oninput=e=>{S.f.hq=e.target.value; const p=e.target.selectionStart; mHours(); $('hq').focus(); $('hq').setSelectionRange(p,p);};
+    if($('maForm')) $('maForm').onsubmit = async e => { e.preventDefault(); const b=$('maB'); busy(b,true);
+      try{ S.mgmt = await call('managerAddHours',{email:$('maE').value,date:$('maD').value,hours:$('maH').value,activity:$('maA').value}); toast('Hours added'); renderMgmt(); }catch(_){busy(b,false);} };
+    document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!confirm('Remove this entry? It will no longer count toward their hours.'))return; busy(b,true);
+      try{ S.mgmt = await call('removeHours', b.dataset.rm); toast('Entry removed'); renderMgmt(); }catch(_){busy(b,false);} });
+  }
+
+  function mPeople(){
+    const opt = (arr, v) => arr.map(a=>`<option ${a===v?'selected':''}>${esc(a)}</option>`).join('');
+    const pf = S.f.ps || 'Active';
+    const counts = {Active:0,Suspended:0,Terminated:0};
+    m.staff.forEach(p=>counts[p.status]=(counts[p.status]||0)+1);
+    const list = m.staff.filter(p=>(pf==='All'||p.status===pf) && (!S.f.pq || (p.name+' '+p.email+' '+(p.studentNumber||'')).toLowerCase().includes(S.f.pq.toLowerCase())));
+    const stBadge = p => p.status==='Active'?'<span class="badge b-ok">Active</span>':p.status==='Suspended'?`<span class="badge b-warn">Suspended${p.suspendedUntil?' until '+fmtD(p.suspendedUntil):''}</span>`:`<span class="badge b-bad">Left${p.leftOn?' '+fmtD(p.leftOn):''}</span>`;
+    const ini = n => n.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+    $('mBody').innerHTML = `
+    <div class="card" style="margin-bottom:14px"><h3>Add a person</h3>
+      <form id="auForm">
+        <div class="frow">
+          <div class="wide"><label>Email</label><input type="email" id="auE" required></div>
+          <div class="wide"><label>Full name</label><input id="auN" required></div>
+          <div><label>Role</label><select id="auR">${opt(m.roles,'Staff')}</select></div>
+          <div><label>Area</label><select id="auA">${opt(m.areas,m.areas[0])}</select></div>
+        </div>
+        <div class="frow">
+          <div><label>Phone</label><input id="auP" type="tel"></div>
+          <div><label>Student number</label><input id="auS"></div>
+          <div><label>Start date</label><input type="date" id="auD" value="${m.today}"></div>
+          <div><label>Weekly hours</label><input type="number" id="auT" min="1" max="40" placeholder="${m.settings.defaultTarget}"></div>
+        </div>
+        <button class="btn" style="margin-top:12px" id="auB">Add &amp; generate password</button>
+        <span class="hint" style="margin-left:8px">The temporary password is shown once. They choose their own at first sign-in.</span>
+      </form></div>
+    <div class="card"><h3>Team</h3>
+      <div class="filters">
+        <div class="seg" style="margin:0">${[['Active','Active'],['Suspended','Suspended'],['Terminated','Former staff'],['All','All']].map(([k,l])=>`<button type="button" data-pf="${k}" class="${pf===k?'on':''}">${l}${k!=='All'?' ('+(counts[k]||0)+')':''}</button>`).join('')}</div>
+        <input id="pq" placeholder="Search name, email or student no." value="${esc(S.f.pq||'')}">
+      </div>
+      ${list.map(p=>`<div class="person">
+        <div class="who2"><div class="avatar">${esc(ini(p.name))}</div>
+          <div><b>${esc(p.name)}</b> ${stBadge(p)} ${p.warnings?`<span class="badge ${p.warnings>=m.settings.maxWarnings?'b-bad':'b-warn'}">${p.warnings}/${m.settings.maxWarnings} warnings</span>`:''}
+          <div class="hint" style="margin:2px 0 0">${esc(p.role)} · ${esc(p.area)} · ${esc(p.email)}${p.phone?' · '+esc(p.phone):''}</div>
+          <div class="hint" style="margin:0">Started ${p.startDate?fmtD(p.startDate):'—'} · ${fmtH(p.termWorked)} h this term · last sign-in ${esc(p.lastLogin||'never')}</div></div></div>
+        <button class="btn ghost sm" data-mg="${esc(p.email)}">Manage</button></div>`).join('') || '<div class="empty">No one here.</div>'}
+    </div>`;
+
+    document.querySelectorAll('[data-pf]').forEach(b=>b.onclick=()=>{S.f.ps=b.dataset.pf; mPeople();});
+    $('pq').oninput=e=>{S.f.pq=e.target.value; const p=e.target.selectionStart; mPeople(); $('pq').focus(); $('pq').setSelectionRange(p,p);};
+    $('auForm').onsubmit = async e => { e.preventDefault(); const b=$('auB'); busy(b,true);
+      try{ const r = await call('addUser',{email:$('auE').value,name:$('auN').value,role:$('auR').value,area:$('auA').value,target:$('auT').value,
+          phone:$('auP').value,studentNumber:$('auS').value,startDate:$('auD').value});
+        S.mgmt=r.data; const em=$('auE').value; renderMgmt(); showPassword(em, r.password); }catch(_){busy(b,false);} };
+    document.querySelectorAll('[data-mg]').forEach(b=>b.onclick=()=>openPerson(b.dataset.mg));
+  }
+
+  function openPerson(email, tab){
+    const p = S.mgmt.staff.find(x=>x.email===email); if(!p) return;
+    const opt = (arr, v) => arr.map(a=>`<option ${a===v?'selected':''}>${esc(a)}</option>`).join('');
+    const hist = S.mgmt.hr.filter(h=>h.email===email);
+    const self = email===S.mgmt.me.email;
+    const acts = p.status==='Active'
+      ? [['Warning','Written warning'],['Note','Add note'],['Suspend','Suspend'],['Terminate','Remove from team']]
+      : [['Reinstate','Reinstate'],['Note','Add note']];
+    const act = tab || acts[0][0];
+    $('modalRoot').innerHTML = `<div class="modal"><div class="card wide">
+      <div class="req-h"><h3 style="margin:0">${esc(p.name)}</h3><button class="btn ghost sm" id="pmClose">Close</button></div>
+      <div class="hint" style="margin:4px 0 0">${esc(p.email)}</div>
+
+      <h3 style="margin-top:18px">Details</h3>
+      <form id="pmEdit">
+        <div class="frow">
+          <div class="wide"><label>Full name</label><input id="peN" value="${esc(p.name)}"></div>
+          <div><label>Role</label><select id="peR" ${self?'disabled':''}>${opt(S.mgmt.roles,p.role)}</select></div>
+          <div><label>Area</label><select id="peA">${opt(S.mgmt.areas,p.area)}</select></div>
+        </div>
+        <div class="frow">
+          <div><label>Phone</label><input id="peP" value="${esc(p.phone||'')}"></div>
+          <div><label>Student number</label><input id="peS" value="${esc(p.studentNumber||'')}"></div>
+          <div><label>Start date</label><input type="date" id="peD" value="${esc(p.startDate||'')}"></div>
+          <div><label>Weekly hours</label><input type="number" id="peT" min="1" max="40" value="${p.target}"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn sm" id="peB">Save details</button>
+          <button class="btn ghost sm" type="button" id="peRP">Reset password</button></div>
+      </form>
+
+      <h3 style="margin-top:22px">HR action</h3>
+      ${self?'<div class="hint">You can add notes to your own file, but not suspend or remove yourself.</div>':''}
+      <div class="seg">${acts.filter(([k])=>!(self&&(k==='Suspend'||k==='Terminate'))).map(([k,l])=>`<button type="button" data-ac="${k}" class="${act===k?'on':''} ${k==='Terminate'?'danger':''}">${l}</button>`).join('')}</div>
+      <form id="pmAct">
+        <div class="frow">
+          <div><label>${act==='Terminate'?'Last day':'Date'}</label><input type="date" id="haD" value="${S.mgmt.today}"></div>
+          ${act==='Suspend'?`<div><label>Suspended until (optional)</label><input type="date" id="haU" min="${S.mgmt.today}"></div>`:''}
+        </div>
+        <label>${{Warning:'What is the warning for?',Note:'Note',Suspend:'Reason for suspension',Reinstate:'Comment (optional)',Terminate:'Reason for removing them'}[act]}</label>
+        <textarea id="haT" maxlength="1000"></textarea>
+        ${act==='Terminate'?'<div class="hint">They will no longer be able to sign in. Their future bookings and pending requests are cancelled. Their hours and HR file are kept, and you can reinstate them later.</div>':''}
+        ${act==='Suspend'?'<div class="hint">They can still sign in to view their dashboard, but can’t do anything. Shows they booked in that time are unbooked. With an end date, full access returns automatically afterwards.</div>':''}
+        <button class="btn ${act==='Terminate'?'bad':''}" style="margin-top:12px" id="haB">${{Warning:'Record warning',Note:'Save note',Suspend:'Suspend',Reinstate:'Reinstate',Terminate:'Remove from team'}[act]}</button>
+      </form>
+
+      <h3 style="margin-top:22px">HR file</h3>
+      ${hist.length?hist.map(h=>`<div class="hr-item ${esc(h.type)}"><b>${esc(h.type)}</b> · ${fmtD(h.date)} <span class="hint">by ${esc(h.by)}</span><div>${esc(h.details)}</div></div>`).join(''):'<div class="empty">Nothing on file yet.</div>'}
+    </div></div>`;
+
+    $('pmClose').onclick = () => $('modalRoot').innerHTML='';
+    document.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>openPerson(email, b.dataset.ac));
+    $('pmEdit').onsubmit = async e => { e.preventDefault(); const b=$('peB'); busy(b,true);
+      try{ S.mgmt = await call('updateUser',{email,name:$('peN').value,role:$('peR').value,area:$('peA').value,phone:$('peP').value,
+          studentNumber:$('peS').value,startDate:$('peD').value,target:$('peT').value}); toast('Details saved'); renderMgmt(); openPerson(email); }catch(_){busy(b,false);} };
+    $('peRP').onclick = async () => { if(!confirm('Generate a new password for '+p.name+'? Their old password stops working.')) return; const b=$('peRP'); busy(b,true);
+      try{ const r = await call('resetUserPassword', email); showPassword(email, r.password); }catch(_){busy(b,false);} };
+    $('pmAct').onsubmit = async e => { e.preventDefault();
+      if(act==='Terminate' && !confirm('Remove '+p.name+' from the team? They will lose access immediately.')) return;
+      const b=$('haB'); busy(b,true);
+      try{ S.mgmt = await call('hrAction',{email,action:act,details:$('haT').value,date:$('haD').value,until:$('haU')?$('haU').value:''});
+        toast({Warning:'Warning recorded',Note:'Note saved',Suspend:'Suspended',Reinstate:'Reinstated',Terminate:'Removed from team'}[act]);
+        renderMgmt();
+        const np2 = S.mgmt.staff.find(x=>x.email===email), mx = S.mgmt.settings.maxWarnings;
+        if(act==='Warning' && np2 && np2.warnings>=mx && np2.status==='Active' &&
+           confirm(p.name+' has now reached the warning limit ('+np2.warnings+' of '+mx+'). Do you want to remove them from the team?')) openPerson(email,'Terminate');
+        else openPerson(email); }catch(_){busy(b,false);} };
+  }
+
+  function mSettings(){
+    $('mBody').innerHTML = `<div class="card" style="max-width:620px"><h3>Settings</h3>
+      <form id="sForm">
+        <label>Term start (counting starts the Monday of this week)</label><input type="date" id="sT" value="${esc(m.settings.termStart)}" required>
+        <label>Default minimum hours per week</label><input type="number" id="sH" min="1" max="40" step="0.5" value="${m.settings.defaultTarget}" required>
+        <label>How far ahead staff can book (days)</label><input type="number" id="sW" min="1" max="90" value="${m.settings.bookingWindow}" required>
+        <div class="hint">Individual staff can have their own weekly target under People &amp; HR. Approved leave lowers that week's target by one fifth per weekday off.</div>
+        <label>Warning limit (warnings before removal from the team)</label><input type="number" id="sMW" min="1" max="10" value="${m.settings.maxWarnings}" required>
+        <label>Iono.fm stream ID (songs from RadioDJ show automatically)</label>
+        <div class="frow"><div class="wide"><input id="sIO" placeholder="Stream ID, or the full xmetadata link" value="${esc(m.settings.ionoStream||'')}"></div>
+          <div style="flex:0 0 auto"><button class="btn ghost" type="button" id="sIOT">Test</button></div></div>
+        <div class="hint" id="sIOR" style="margin-top:6px">Leave blank to set Now Playing by hand on the Requests page.</div>
+        <label>Live stream link (for the listener website player)</label><input id="sSU" placeholder="https:..." value="${esc(m.settings.streamUrl)}">
+        <div class="hint" style="margin-top:6px">Use the syndication URL from Iono.fm (Streaming → Setup encoder).</div>
+        <label>Useful links (one per line: Name | link)</label><textarea id="sL" rows="6" style="font-family:monospace;font-size:13px">${esc(m.settings.linksRaw)}</textarea>
+        <div class="hint">These appear under the link icon next to the notification bell for everyone. Leave the link blank to show “not set yet”.</div>
+        <button class="btn" style="margin-top:14px" id="sB">Save settings</button></form></div>`;
+    $('sIOT').onclick = async () => { const b=$('sIOT'); busy(b,true);
+      try{ $('sIOR').textContent = await call('testIono', $('sIO').value); $('sIOR').style.color='var(--ok)'; }catch(e){ $('sIOR').textContent=((e&&e.message)||'').split('Error: ').join(''); $('sIOR').style.color='#ff8a8d'; }
+      busy(b,false); };
+    $('sForm').onsubmit = async e => { e.preventDefault(); const b=$('sB'); busy(b,true);
+      try{ S.mgmt = await call('saveSettings',{termStart:$('sT').value,defaultTarget:$('sH').value,bookingWindow:$('sW').value,maxWarnings:$('sMW').value,streamUrl:$('sSU').value,links:$('sL').value,ionoStream:$('sIO').value}); toast('Settings saved'); renderMgmt(); }catch(_){busy(b,false);} };
+  }
+}
+
+function showPassword(email, pw){
+  $('modalRoot').innerHTML = `<div class="modal"><div class="card"><h3>Temporary password</h3>
+    <div class="hint" style="margin:0">For <b>${esc(email)}</b>. Copy it now and share it privately — it won't be shown again.</div>
+    <div class="pw" id="pwShow">${esc(pw)}</div>
+    <div style="display:flex;gap:8px"><button class="btn" id="cpy">Copy</button><button class="btn ghost" id="cls">Done</button></div></div></div>`;
+  $('cpy').onclick=()=>{ try{ navigator.clipboard.writeText(pw).then(()=>toast('Copied')); }catch(e){ toast('Select the password and copy it manually'); } };
+  $('cls').onclick=()=>$('modalRoot').innerHTML='';
+}
+
+const Mock = (() => {
+  const t = new Date(); const ymd = d => d.toISOString().slice(0,10);
+  const mon = (()=>{const d=new Date(t); d.setDate(d.getDate()-((d.getDay()+6)%7)); return d;})();
+  const wk = n => { const d=new Date(mon); d.setDate(d.getDate()-7*n); return ymd(d); };
+  const day = n => { const d=new Date(t); d.setDate(d.getDate()+n); return ymd(d); };
+  const today = ymd(t);
+  const recent = [5,3.5,4,2,6,4.5,4,2].map((w,i)=>({week:wk(7-i),worked:w,booked:0,target:4,leaveDays:0,short:Math.max(0,4-w),unbooked:Math.max(0,4-w)}));
+  recent[3].target=2.5; recent[3].leaveDays=2; recent[3].short=0.5; recent[3].unbooked=0.5;
+  recent[7].booked=2; recent[7].unbooked=0;
+  const me = {email:'thandi@kovsiex.co.za',name:'Thandi Mokoena',role:'Manager',area:'Radio',target:4,startDate:'2025-04-09'};
+  const demoImg = 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http:'+'/'+'/www.w3.org/2000/svg" viewBox="0 0 120 120"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2a900"/><stop offset="1" stop-color="#d6339c"/></linearGradient></defs><rect width="120" height="120" fill="url(#g)"/><circle cx="60" cy="48" r="20" fill="#fff" opacity=".9"/><rect x="30" y="74" width="60" height="34" rx="17" fill="#fff" opacity=".9"/></svg>');
+  const occ = (id,date,start,end,show,name,w,perm,own,past,ns) => ({id,date,start,end,show,name,with:w,permanent:perm,isOwner:own,past:!!past,noShow:!!ns,
+    hours:((+end.slice(0,2)*60+ +end.slice(3))-(+start.slice(0,2)*60+ +start.slice(3)))/60});
+  const studio = [occ('b1',day(1),'06:00','08:00','The Breakfast Show','Thandi Mokoena','Lerato Nkosi',true,true),
+    occ('b2',day(1),'12:00','13:00','Lunch Mix','Kamo Sithole','',false,false),
+    occ('b3',day(3),'16:00','18:00','Drive Time','Ayanda Dlamini','Thandi Mokoena',true,false),
+    occ('b1',day(8),'06:00','08:00','The Breakfast Show','Thandi Mokoena','Lerato Nkosi',true,true),
+    occ('b4',day(5),'19:00','20:00','Campus Sports Talk','Pieter van Wyk','Naledi Mahlangu',false,false)];
+  const nowMs=Date.now(); const liveNow={onAir:[{show:'Drive Time',name:'Ayanda Dlamini',with:'Lerato Nkosi',date:today,start:'17:00',end:'19:00',startMs:nowMs-47*6e4-12e3,endMs:nowMs+73*6e4,permanent:true,image:demoImg}],next:{show:'Late Night Lounge',name:'Kamo Sithole',with:'',date:today,start:'20:00',end:'22:00',startMs:nowMs+133*6e4,endMs:nowMs+253*6e4},serverNow:nowMs};
+  const links=[{label:'Welcome package',url:'https:'+'/'+'/example.com'},{label:'How-to guide',url:''},{label:'Traffic (SANRAL i-traffic)',url:'https:'+'/'+'/www.i-traffic.co.za'},{label:'Weather (SA Weather Service)',url:'https:'+'/'+'/www.weathersa.co.za'}];
+  const lr = {types:['Request','Shoutout','Traffic','Joke','Competition','Other'], publicUrl:'https:'+'/'+'/script.google.com/macros/s/AKfyc.../exec?p=listen', readOnly:false,
+    nowPlaying:{title:'Push It',artist:'Salt-N-Pepa',art:'',at:'19:58'},
+    recent:[{title:'Push It',artist:'Salt-N-Pepa',art:'',at:'19:58'},{title:'Water',artist:'Tyla',art:'',at:'19:54'},{title:'Mnike',artist:'Tyler ICU, Tumela_za',art:'',at:'19:50'}],
+    list:[{id:'l1',name:'timd5824',type:'Shoutout',message:'Shoutout to everyone at Karee res!',source:'Website',verified:false,status:'New',pinned:false,created:today+' 19:56:10'},
+      {id:'l2',name:'Ayanda Dlamini',type:'Request',message:'Can we get some amapiano for the drive home?',source:'Staff portal',verified:true,status:'New',pinned:false,created:today+' 19:55:02'},
+      {id:'l3',name:'Lebo',type:'Request',message:'Water by Tyla please!!',source:'Website',verified:false,status:'Done',pinned:false,created:today+' 19:40:00'},
+      {id:'l4',name:'Mpho',type:'Traffic',message:'Nelson Mandela Dr backed up near the N1',source:'Website',verified:false,status:'New',pinned:true,created:today+' 19:31:00'}]};
+  const notes=[{id:'n1',type:'Warning',title:'You have received a written warning (1 of 3)',body:'Missed a booked show without telling anyone — 2 more and you will be removed from the team.',page:'shows',read:false,created:today+' 18:02'},
+    {id:'n2',type:'Review',title:'Your show was reviewed by Ayanda Dlamini',body:'The Breakfast Show · 06:00–08:00',page:'shows',read:false,created:today+' 11:15'},
+    {id:'n3',type:'Leave',title:'Your leave was approved',body:'Exam week · by Thandi Mokoena — good luck!',page:'leave',read:true,created:day(-1)+' 16:40'}];
+  const dash = {user:me,today,live:liveNow,links,unread:2,publicUrl:lr.publicUrl,maxWarnings:3,
+    warnings:[{date:day(-1),details:'Missed a booked show without telling anyone.',by:'Thandi Mokoena'}],
+    reviews:[{id:'r1',show:'The Breakfast Show',date:day(-6),music:4,mic:5,engagement:3,imaging:4,comments:'Nice cheerful start and your mic is clear. Try dipping the music and talking over it instead of cutting it.',by:'Ayanda Dlamini'}],maxDate:day(21),bookingWindow:21,stats:{target:4,thisWeek:recent[7],termStart:wk(7),termWorked:31,termExpected:30.5,pastShort:2.5,weeksMet:4,pastWeeks:7,recentWeeks:recent},
+    upcoming:[studio[0],studio[2],studio[3]],
+    recent:[occ('b1',day(-6),'06:00','08:00','The Breakfast Show','Thandi Mokoena','Lerato Nkosi',true,true,1),occ('b9',day(-9),'14:00','15:00','Afternoon Request Hour','Thandi Mokoena','',false,true,1)],
+    extraHours:[], studio, staffList:[{email:'ayanda@kovsiex.co.za',name:'Ayanda Dlamini'},{email:'kamo@kovsiex.co.za',name:'Kamo Sithole'},{email:'lerato@kovsiex.co.za',name:'Lerato Nkosi'}],
+    requests:[{id:'r9',type:'Leave',start:day(9),end:day(9),reason:'Exam week — accounting paper',status:'Pending Manager',comment:''}]};
+  const ppl = [['Lerato Nkosi','Staff',2,2,0],['Pieter van Wyk','Staff',1,1,1.5],['Ayanda Dlamini','Supervisor',4,2,0],['Kamo Sithole','Staff',0.5,1,4],['Naledi Mahlangu','Staff',0,1,0]];
+  const mgmt = {me,isManager:true,today,live:liveNow,hrTypes:['Warning','Note'],
+    hr:[{email:'kamo@kovsiex.co.za',name:'Kamo Sithole',type:'Warning',details:'Missed two booked shows without telling anyone.',date:day(-3),by:'Thandi Mokoena'},{email:'kamo@kovsiex.co.za',name:'Kamo Sithole',type:'Hired',details:'Added as Staff (Radio)',date:wk(7),by:'Thandi Mokoena'},{email:'sipho@kovsiex.co.za',name:'Sipho Ndlovu',type:'Terminated',details:'Stopped coming in for a month.',date:day(-20),by:'Thandi Mokoena'}],roles:['Staff','Supervisor','Manager'],areas:['Radio','All areas'],settings:{termStart:wk(7),defaultTarget:4,bookingWindow:21,maxWarnings:3,streamUrl:'',links:links,linksRaw:'Welcome package | https:'+'/'+'/example.com'},
+    staff:ppl.map(([n,r,w,bk,p],i)=>({email:n.split(' ')[0].toLowerCase()+'@kovsiex.co.za',name:n,role:r,area:'Radio',active:true,status:'Active',warnings:n==='Kamo Sithole'?1:0,phone:'082 555 01'+i+'0',studentNumber:'2023'+(40110+i),startDate:wk(7),target:4,lastLogin:i%2?'':today+' 09:1'+i,
+      week:{week:wk(0),worked:w,booked:bk,target:4,leaveDays:0,short:Math.max(0,4-w),unbooked:Math.max(0,4-w-bk)},pastShort:p,termWorked:20+i*3,weeksMet:7-Math.ceil(p/2),pastWeeks:7})).concat([{email:'sipho@kovsiex.co.za',name:'Sipho Ndlovu',role:'Staff',area:'Radio',active:false,status:'Terminated',leftOn:day(-20),warnings:0,startDate:wk(20),target:4,lastLogin:'',week:{week:wk(0),worked:0,booked:0,target:4,short:4,unbooked:4},pastShort:0,termWorked:6,weeksMet:0,pastWeeks:7}]),
+    schedule:[occ('b7',day(-2),'10:00','12:00','Morning Vibes','Kamo Sithole','',false,false,1,1),occ('b1',day(-6),'06:00','08:00','The Breakfast Show','Thandi Mokoena','Lerato Nkosi',true,false,1)].concat(studio),
+    requests:[
+      {id:'q1',name:'Kamo Sithole',type:'Excuse',start:day(-2),end:day(-2),reason:'Was ill on Tuesday, missed the morning show. Doctor’s note available.',status:'Pending Supervisor',created:today+' 08:40',canAct:true},
+      {id:'q2',name:'Pieter van Wyk',type:'Leave',start:day(10),end:day(12),reason:'Family wedding in Bloemfontein.',status:'Pending Manager',supervisorBy:'Ayanda Dlamini',created:today+' 07:55',canAct:true},
+      {id:'q3',name:'Lerato Nkosi',type:'Leave',start:wk(3),end:wk(3),reason:'Sports tour.',status:'Approved',supervisorBy:'Ayanda Dlamini',managerBy:'Thandi Mokoena',created:wk(4)+' 10:02',canAct:false}],
+    hours:[{id:'h1',name:'Pieter van Wyk',date:day(-3),hours:3,area:'Radio',activity:'Outside broadcast at rugby'}]};
+  return { call(fn, args){ return new Promise((res,rej)=>setTimeout(()=>{
+    if(fn==='login') return res({token:'demo',user:me,mustChange:false});
+    if(fn==='getDashboard') return res(dash);
+    if(fn==='getManagement') return res(mgmt);
+    if(fn==='getLive') return res(liveNow);
+    if(fn==='getPulse') return res({live:liveNow,unread:2});
+    if(fn==='getNotifications') return res({list:notes,unread:2});
+    if(fn==='markNotificationsRead') return res(true);
+    if(fn==='getListenerRequests') return res(lr);
+    if(['staffSendRequest','updateListenerRequest','setNowPlaying'].includes(fn)){ toast('Preview only — saved once deployed'); return res(lr); }
+    if(fn==='addUser'||fn==='resetUserPassword') return res({password:'Kx-7hQmPz4tRw',data:mgmt});
+    toast('Preview only — changes are saved once this runs from Apps Script');
+    res(['bookSlot','cancelBooking','setBookingImage','submitRequest','cancelRequest'].includes(fn)?dash:mgmt);
+  },250)); } };
+})();
+if(!LIVE) $('previewBar').classList.remove('hidden');
+(function restore(){
+  const t = LIVE && store.get('kx_token'); if(!t) return;
+  show('appView'); $('main').innerHTML='<div class="loader"></div>';
+  api('getDashboard', t).then(d => { S.token=t; S.user=d.user; enterApp(); }).catch(() => showLogin());
+})();
+window.KX = { go: go, liveHTML: liveHTML, state: S };
+})();
+</script>
+</body>
+</html>
